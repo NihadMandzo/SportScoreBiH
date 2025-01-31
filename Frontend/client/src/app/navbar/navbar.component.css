@@ -1,0 +1,84 @@
+/* Glavni stil za sidebar */
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(135deg, #087b3a, #0bbf61); /* Tamnije nijanse zelene */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+/* Sidebar header za toggle dugme */
+.sidebar-header {
+  padding: 10px;
+  text-align: left;
+}
+
+/* Dugme za toggle */
+.toggle-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.toggle-button:hover {
+  color: #0bbf61; /* Svjetlija zelena kod hovera */
+}
+
+/* Sidebar stavke */
+.sidebar-content {
+  padding: 10px 0;
+  flex: 1; /* Omogućava da footer bude na dnu */
+}
+
+.sidebar-content ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-content ul li {
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15); /* Blago tamnija pozadina */
+  border-radius: 5px;
+  margin: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar-content ul li:hover {
+  background: rgba(255, 255, 255, 0.3); /* Blago svjetlija pozadina kod hovera */
+  color: #064e29; /* Tamnija zelena za tekst */
+}
+
+/* Footer na dnu */
+.sidebar-footer {
+  padding: 10px;
+}
+
+.sidebar-footer button {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.15); /* Blago tamnija pozadina za dugme */
+  border: none;
+  padding: 10px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sidebar-footer button:hover {
+  background: rgba(255, 255, 255, 0.3); /* Hover efekat za dugme */
+  color: #064e29; /* Tamnija zelena za tekst dugmeta */
+}

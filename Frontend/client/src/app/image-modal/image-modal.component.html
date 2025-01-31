@@ -1,0 +1,12 @@
+<div mat-dialog-content class="image-modal-content" #imageContainer>
+  <img #zoomImage [src]="data.imgSrc" alt="Pregled slike" class="image-modal-image"
+    (wheel)="onZoom($event)" 
+    (dblclick)="toggleZoom()" 
+    (mousedown)="startDragging($event)" 
+    (mousemove)="dragging && onDrag($event)" 
+    (mouseup)="stopDragging()" 
+    (mouseleave)="stopDragging()">
+  <button class="close-button" mat-icon-button [mat-dialog-close]="true" aria-label="Zatvori">
+    <span class="material-icons">close</span>
+  </button>
+</div>

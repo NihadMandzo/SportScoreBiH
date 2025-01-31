@@ -1,0 +1,26 @@
+<div class="profile-container">
+  <h2>Profil</h2>
+
+  <form (ngSubmit)="updateProfile()">
+    <div>
+      <label for="username">Korisničko ime:</label>
+      <input id="username" [(ngModel)]="user.userName" name="username" type="text" />
+    </div>
+
+    <div>
+      <label for="email">E-mail:</label>
+      <input id="email" [(ngModel)]="user.eMail" name="email" type="email"  />
+    </div>
+
+    <div>
+      <label for="phoneNumber">Broj telefona:</label>
+      <input id="phoneNumber" [(ngModel)]="user.phoneNumber" name="phoneNumber" type="text"  />
+    </div>
+
+    <button type="submit" >Ažuriraj profil</button>
+  </form>
+
+  <button class="delete-btn" (click)="deleteProfile()">Obriši profil</button>
+  <button class="redirect-btn" (click)="goToHome()">Idi na početnu</button>
+</div>
+

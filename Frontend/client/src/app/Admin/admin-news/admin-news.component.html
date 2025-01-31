@@ -1,0 +1,78 @@
+<div class="news-container">
+  <div class="news-header">
+    <select [(ngModel)]="selectedClubId" (change)="filterNewsByClub()">
+      <option [value]="null">Svi klubovi</option>
+      <option *ngFor="let club of clubs" [value]="club.id">{{ club.name }}</option>
+    </select>
+    <button mat-raised-button color="primary" class="AddButton" (click)="addNews()">
+      <mat-icon>add</mat-icon> Dodaj
+    </button>
+  </div>
+
+  <div class="news-table-wrapper">
+    <table mat-table [dataSource]="newsList" class="news-table">
+      <!-- Title Column -->
+      <ng-container matColumnDef="naslov">
+        <th mat-header-cell *matHeaderCellDef> Naslov </th>
+        <td mat-cell *matCellDef="let element" class="title-column">
+          <div class="truncate-text">{{element.title}}</div>
+        </td>
+      </ng-container>
+
+      <!-- Date Column -->
+      <ng-container matColumnDef="datum">
+        <th mat-header-cell *matHeaderCellDef> Datum </th>
+        <td mat-cell *matCellDef="let element" class="date-column"> {{element.dateTime | date:'dd.MM.yyyy'}} </td>
+      </ng-container>
+
+      <!-- Content Column -->
+      <ng-container matColumnDef="sadrzaj">
+        <th mat-header-cell *matHeaderCellDef> Sadržaj </th>
+        <td mat-cell *matCellDef="let element" class="content-column">
+          <div class="truncate-text">{{element.content}}</div>
+        </td>
+      </ng-container>
+
+      <!-- Image Column -->
+      <ng-container matColumnDef="slika">
+        <th mat-header-cell *matHeaderCellDef> Slika </th>
+        <td mat-cell *matCellDef="let element" class="image-column">
+          <img [src]="element.pictures[0]" alt="Slika" class="news-image">
+        </td>
+      </ng-container>
+
+      <!-- Clubs Column -->
+      <ng-container matColumnDef="klubovi">
+        <th mat-header-cell *matHeaderCellDef> Klubovi </th>
+        <td mat-cell *matCellDef="let element" class="clubs-column">
+          <span *ngFor="let club of element.clubs" class="club-tag">
+            {{club.name}}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="akcije">
+        <th mat-header-cell *matHeaderCellDef> Akcije </th>
+        <td mat-cell *matCellDef="let element" class="actions-column">
+          <button mat-icon-button (click)="editNews(element.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteNews(element.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  <mat-paginator [length]="totalItems"
+                 [pageSize]="pageSize"
+                 [pageSizeOptions]="[2,5,10]"
+                 (page)="onPageChange($event)">
+  </mat-paginator>
+</div>
+

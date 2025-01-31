@@ -1,0 +1,79 @@
+form {
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+hr {
+  margin: 1rem 0 1.5rem;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+div {
+  text-align: center;
+}
+
+/* Facebook button */
+.btn-facebook {
+  background-color: #3b5998;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.btn-facebook:hover {
+  background-color: #2d4373;
+}
+
+
+.btn-google {
+  background-color: #db4437;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.btn-google:hover {
+  background-color: #c1351d;
+}
+
+
+.line-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 1rem 0;
+}
+
+.line {
+  border: none;
+  border-top: 1px solid #ddd;
+  flex-grow: 1;
+  margin: 0 1rem;
+}
+
+.or-text {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #555;
+  background: #f9f9f9;
+  padding: 0 0.5rem;
+}
+

@@ -1,0 +1,221 @@
+<div class="news-layout">
+  <!-- Go Back Button -->
+  <button class="go-back-button" (click)="goBack()">‹ Povratak</button>
+
+  <!-- Left Container: Title, Image, and Content -->
+  <div class="news-main-container">
+    <!-- Title -->
+    <div class="news-title">
+      <h1>{{ newsDetails.title }}</h1>
+    </div>
+
+    <div class="news-carousel">
+      <div class="carousel-container">
+        <!-- Slides Wrapper -->
+        <div
+          class="carousel-track"
+          [style.transform]="'translateX(' + -activeSlide * 100 + '%)'"
+        >
+          <!-- Each Slide -->
+          <div
+            *ngFor="let picture of newsDetails.pictures"
+            class="carousel-slide"
+          >
+            <img
+              [src]="picture || 'https://via.placeholder.com/150'"
+              alt="News Image"
+              (click)="openImageModal(picture!)"
+            />
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <button
+          class="carousel-prev"
+          (click)="previousSlide()"
+          [disabled]="!canNavigateLeft()"
+        >
+          ‹
+        </button>
+        <button
+          class="carousel-next"
+          (click)="nextSlide()"
+          [disabled]="!canNavigateRight()"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+
+    <!-- Clubs Section -->
+    <div class="news-clubs">
+      <div *ngFor="let club of newsDetails.clubs" class="club-card">
+        {{ club.name }}
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="news-content">
+      <p>{{ newsDetails.content }}</p>
+    </div>
+  </div>
+
+  <!-- Right Container: Admin, Social Media, and Comments -->
+  <div class="news-sidebar-container">
+    <!-- Admin Info -->
+    <div class="news-admin">
+      <p>
+        <strong>Autor:</strong> {{ newsDetails.admin.firstName }}
+        {{ newsDetails.admin.lastName }}
+      </p>
+      <p>
+        <strong>Datum:</strong> {{ newsDetails.dateTime | date : "medium" }}
+      </p>
+    </div>
+
+    <!-- Social Media Sharing -->
+    <div class="news-social">
+      <!-- Import Angular Material button and icon modules in your module -->
+      <button
+        mat-icon-button
+        color="primary"
+        (click)="shareOnWhatsApp()"
+        aria-label="Share on Facebook"
+      >
+        <fa-icon [icon]="faWhatsapp" class="fa-3x"></fa-icon>
+      </button>
+      <button
+        mat-icon-button
+        color="primary"
+        (click)="shareOnTwitter()"
+        aria-label="Share on LinkedIn"
+      >
+        <fa-icon [icon]="faTwitter" class="fa-3x"></fa-icon>
+      </button>
+      <button mat-icon-button color="primary" (click)="copyUrlToClipboard()">
+        <fa-icon [icon]="faCopy" class="fa-3x"></fa-icon>
+      </button>
+      <span *ngIf="isCopied" class="copy-notification">Kopirano!</span>
+    </div>
+
+    <div class="qr-code">
+      <h3>Podijelite putem QR koda:</h3>
+      <qrcode [qrdata]="qrCodeValue" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+    </div>
+
+
+
+    <!-- Comments -->
+    <div class="news-comments">
+      <h2>Komentari</h2>
+      <!-- Display top 3 comments -->
+      <div *ngFor="let comment of comments" class="comment">
+        <p class="comment-username">
+          <strong>{{ comment.username }}</strong>
+        </p>
+        <p class="comment-text">{{ comment.comment }}</p>
+        <p class="comment-date">{{ comment.dateTime | date : "medium" }}</p>
+
+        <!-- Like/Dislike Buttons -->
+        <div class="comment-row">
+          <!-- Reaction Buttons -->
+          <div class="reaction-buttons">
+            <!-- Like Icon -->
+            <fa-icon
+              [icon]="faThumbsUp"
+              [ngClass]="{ 'active-like': isReactionActive(comment, 'like'), 'inactive-like': !isReactionActive(comment, 'like') }"
+              (click)="reactToComment(comment.id, true)"
+              class="reaction-icon"
+            ></fa-icon>
+            <span class="reaction-count">{{ comment.like }}</span>
+
+            <!-- Dislike Icon -->
+            <fa-icon
+              [icon]="faThumbsDown"
+              [ngClass]="{ 'active-dislike': isReactionActive(comment, 'dislike'), 'inactive-dislike': !isReactionActive(comment, 'dislike') }"
+              (click)="reactToComment(comment.id, false)"
+              class="reaction-icon"
+            ></fa-icon>
+            <span class="reaction-count">{{ comment.dislike }}</span>
+          </div>
+
+          <!-- Edit/Delete Buttons -->
+          <div *ngIf="comment.username === loggedInUsername" class="comment-actions">
+            <button class="edit-button" (click)="editComment(comment)">Uredi</button>
+            <button class="delete-button" (click)="deleteComment(comment.id)">Izbriši</button>
+          </div>
+        </div>
+
+
+      <!-- No comments message -->
+      <p *ngIf="comments.length === 0" class="no-comments">
+        Nema komentara za ovu vijest.
+      </p>
+    </div>
+    <button class="more-button" (click)="openCommentsDialog()">VIŠE</button>
+  </div>
+</div>
+
+<!-- Dialog Box Template (Use Angular Material Dialog) -->
+<ng-template #commentsDialog>
+  <div class="dialog">
+    <div class="dialog-header">
+      <h2>Svi komentari</h2>
+      <!-- Prikazujemo textarea samo ako korisnik NIJE gost -->
+      <div *ngIf="loggedInUsername!=''; else guestMessage">
+        <textarea
+          placeholder="Dodajte komentar"
+          [(ngModel)]="newComment"
+          class="comment-textarea"
+        ></textarea>
+        <button (click)="addComment()" class="add-comment-button">Dodaj</button>
+      </div>
+      <!-- Poruka za goste sa linkom na login -->
+      <ng-template #guestMessage>
+        <p class="guest-message">
+          Morate se prijaviti kako biste dodali komentar.
+          <button (click)="goToLogin()" class="login-button">Prijava</button>
+        </p>
+      </ng-template>
+    </div>
+    <div class="dialog-comments">
+      <div *ngFor="let comment of allComments" class="comment">
+        <p class="comment-username">
+          <strong>{{ comment.username }}</strong>
+        </p>
+        <p class="comment-text">{{ comment.comment }}</p>
+        <p class="comment-date">{{ comment.dateTime | date : "medium" }}</p>
+        <!-- Prikazujemo dugmad za izmenu i brisanje samo ako je korisnik autor komentara -->
+        <div class="comment-row">
+          <!-- Reaction Buttons -->
+          <div class="reaction-buttons">
+            <!-- Like Icon -->
+            <fa-icon
+              [icon]="faThumbsUp"
+              [ngClass]="{ 'active-like': isReactionActive(comment, 'like'), 'inactive-like': !isReactionActive(comment, 'like') }"
+              (click)="reactToComment(comment.id, true)"
+              class="reaction-icon"
+            ></fa-icon>
+            <span class="reaction-count">{{ comment.like }}</span>
+
+            <!-- Dislike Icon -->
+            <fa-icon
+              [icon]="faThumbsDown"
+              [ngClass]="{ 'active-dislike': isReactionActive(comment, 'dislike'), 'inactive-dislike': !isReactionActive(comment, 'dislike') }"
+              (click)="reactToComment(comment.id, false)"
+              class="reaction-icon"
+            ></fa-icon>
+            <span class="reaction-count">{{ comment.dislike }}</span>
+          </div>
+
+          <!-- Edit/Delete Buttons -->
+          <div *ngIf="comment.username === loggedInUsername" class="comment-actions">
+            <button class="edit-button" (click)="editComment(comment)">Uredi</button>
+            <button class="delete-button" (click)="deleteComment(comment.id)">Izbriši</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+

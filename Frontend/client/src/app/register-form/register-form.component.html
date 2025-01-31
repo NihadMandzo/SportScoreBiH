@@ -1,0 +1,70 @@
+<h3>Registracija</h3>
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+  <!-- Korisničko ime -->
+  <div class="form-group">
+    <label for="username">Korisničko ime</label>
+    <input id="username" formControlName="username" type="text" required class="form-control" />
+    <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="error-message">
+      Unesite korisničko ime
+    </div>
+  </div>
+
+  <!-- Email -->
+  <div class="form-group">
+    <label for="email">Email</label>
+    <input id="email" formControlName="email" type="email" required class="form-control" />
+    <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-message">
+      Unesite važeći email
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="club">Odaberite klub (opcionalno):</label>
+    <select id="club" formControlName="club" class="form-control">
+      <option [ngValue]="null">Nema kluba</option>
+      <option *ngFor="let club of clubs" [ngValue]="club">
+        {{ club.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="phoneNumber">Broj telefona (opcionalno):</label>
+    <input id="phoneNumber" formControlName="phoneNumber" type="phoneNumber"  class="form-control" />
+  </div>
+
+
+  <!-- Lozinka -->
+  <div class="form-group">
+    <label for="password">Lozinka</label>
+    <div class="password-input-container">
+      <input id="password" formControlName="password" [type]="showPassword ? 'text' : 'password'" (input)="onPasswordInput($event)" required class="form-control" />
+    </div>
+    <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error-message">
+      Unesite lozinku
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="confirmPassword">Potvrdi lozinku</label>
+    <input id="confirmPassword" formControlName="confirmPassword" [type]="showPassword ? 'text' : 'password'" required class="form-control" />
+    <div *ngIf="registerForm.hasError('passwordMismatch')" class="error-message">
+      Lozinke se ne podudaraju.
+    </div>
+  </div>
+
+  <label class="show-password-label">
+    <input type="checkbox" (change)="toggleShowPassword()" /> Prikaži lozinku
+  </label>
+
+
+
+  <div *ngIf="passwordStrength" class="password-strength-container">
+    <div class="password-strength-bar" [class.weak]="passwordStrength === 'Very Weak'" [class.fair]="passwordStrength === 'Fair'" [class.good]="passwordStrength === 'Good'" [class.strong]="passwordStrength === 'Strong'"></div>
+    <p class="password-strength-text">Jačina lozinke: {{ passwordStrength }}</p>
+  </div>
+
+  <button type="submit" [disabled]="registerForm.invalid" class="btn btn-primary">Registruj se</button>
+
+
+</form>

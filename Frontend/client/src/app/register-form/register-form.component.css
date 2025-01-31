@@ -1,0 +1,97 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto; /* Omogućava skrolovanje */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    margin: 0 auto;
+
+}
+
+
+  label {
+    /*margin-top: 10px;*/
+    font-weight: bold;
+    color:black;
+  }
+
+
+input {
+  padding: 3px;
+  font-size: 0.7rem;
+}
+
+
+button {
+    margin-top: 15px;
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    background-color: #c0c0c0;
+    cursor: not-allowed;
+  }
+
+  div {
+    color: red;
+    font-size: 0.9rem;
+  }
+
+.password-strength-container {
+  margin-top: 10px;
+  height: 10px;
+  width: 100%;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.password-strength-bar {
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+  width: 0%;
+}
+
+.password-strength-bar.weak {
+  width: 25%;
+  background-color: #ff4d4f;
+}
+
+.password-strength-bar.fair {
+  width: 50%;
+  background-color: #ffa940;
+}
+
+.password-strength-bar.good {
+  width: 75%;
+  background-color: #ffd666;
+}
+
+.password-strength-bar.strong {
+  width: 100%;
+  background-color: #52c41a;
+}
+.password-input-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.password-input-container label {
+  margin-top: 5px;
+  font-size: 0.9em;
+}
+
+input[type="checkbox"] {
+  margin-right: 5px;
+}
+

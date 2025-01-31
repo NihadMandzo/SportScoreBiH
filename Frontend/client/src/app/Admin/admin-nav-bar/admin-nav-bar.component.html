@@ -1,0 +1,39 @@
+<div class="layout">
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav mode="side" class="sidenav" [opened]="true">
+      <mat-toolbar color="primary" class="sidenav-header">
+        <span class="logo">SportScoreBiH</span>
+      </mat-toolbar>
+
+      <mat-nav-list class="nav-list">
+        <!-- Ostale stavke -->
+        <a mat-list-item routerLink="admin-news" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">article</mat-icon>
+          <span>Vijesti</span>
+        </a>
+        <a mat-list-item routerLink="admin-comments" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">chat</mat-icon>
+          <span>Komentari</span>
+        </a>
+        <a mat-list-item routerLink="admin-players" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">shield</mat-icon>
+          <span>Klubovi</span>
+        </a>
+        <a mat-list-item routerLink="admin-matches" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">sports_soccer</mat-icon>
+          <span>Utakmice</span>
+        </a>
+      </mat-nav-list>
+
+      <!-- Profil sa Logout opcijom -->
+      <div mat-list-item class="nav-profile" (click)="logout()">
+        <mat-icon class="nav-icon">logout</mat-icon>
+        <span>Odjavi se</span>
+      </div>
+    </mat-sidenav>
+  </mat-sidenav-container>
+
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

@@ -1,0 +1,245 @@
+
+<label for="ClubFilter" class="form-label">Filtriraj po klubu</label>
+<select
+  class="form-control"
+  id="ClubFilter"
+  [(ngModel)]="selectedClubId"
+  (change)="filterByClub()"
+>
+  <option value="">Svi klubovi</option>
+  <option *ngFor="let club of clubs" [value]="club.id">{{ club.name }}</option>
+</select>
+
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Postojeći Igrači</h2>
+      <ul class="list-group">
+        <li *ngFor="let player of players" class="list-group-item">
+          <strong>Ime i Prezime:</strong> {{ player.firstName }} {{ player.lastName }} <br>
+          <strong>Datum Rođenja:</strong> {{ player.birthDate |date:'dd-MM-yyyy'}}
+          <strong>Pozicija:</strong>{{player.position}}
+          <strong>Klub:</strong>{{player.club.name}}
+
+          <div class="player-image">
+            <div *ngIf="player.picture.blobUrl">
+              <img [src]="player.picture.blobUrl" alt="{{ player.firstName }} {{ player.lastName }}"
+                   class="img-thumbnail"
+                   style=" margin-top: 10px; ">
+            </div>
+          </div>
+          <div *ngIf="!player.picture.blobUrl">
+            <p>Slika nije dostupna.</p>
+          </div>
+
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+               class="bi bi-trash" viewBox="0 0 16 16" style="float:right;cursor:pointer"
+               (click)="deletePlayer(player.id)">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16" style="float:right;cursor:pointer"
+               (click)="setEditPlayer(player)">
+            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+          </svg>
+        </li>
+      </ul>
+      <p *ngIf="players?.length === 0">Nema igrača.</p>
+      <nav *ngIf="totalPages > 1" aria-label="Pagination" class="mt-3">
+        <ul class="pagination justify-content-center">
+          <!-- Previous page -->
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="goToPreviousPage()" [disabled]="currentPage === 1">
+              ←
+            </button>
+          </li>
+
+          <!-- Number of pages -->
+          <li
+            class="page-item"
+            *ngFor="let page of pages"
+            [class.active]="page === currentPage"
+            [class.disabled]="page === '...'">
+            <button
+              class="page-link"
+              (click)="changePage(page)"
+              [disabled]="page === '...'">
+              {{ page }}
+            </button>
+          </li>
+
+          <!-- Next page -->
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="goToNextPage()" [disabled]="currentPage === totalPages">
+              →
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+    </div>
+
+
+
+
+    <div class="col-md-6">
+      <h2>Dodaj Novog Igrača</h2>
+      <form >
+        <div class="mb-3">
+          <label for="FirstName" class="form-label">Ime</label>
+          <input type="text" class="form-control" id="FirstName" name="FirstName" [(ngModel)]="firstName" required
+                 minlength="3" pattern="^[a-zA-ZčČćĆžŽšŠđĐ]+$" #firstNameInput="ngModel">
+          <div *ngIf="firstNameInput.invalid && firstNameInput.touched" class="text-danger">
+            <div *ngIf="firstNameInput.errors?.['required']">Ime je obavezno.</div>
+            <div *ngIf="firstNameInput.errors?.['minlength']">Ime mora imati barem 3 karaktera.</div>
+            <div *ngIf="firstNameInput.errors?.['pattern']">Ime može sadržavati samo slova.</div>
+          </div>
+        </div>
+
+
+
+        <div class="mb-3">
+          <label for="LastName" class="form-label">Prezime</label>
+          <input type="text" class="form-control" id="LastName" name="LastName" [(ngModel)]="lastName" required
+                 minlength="4"pattern="^[a-zA-ZčČćĆžŽšŠđĐ]+$" #lastNameInput="ngModel">
+          <div *ngIf="lastNameInput.invalid && lastNameInput.touched" class="text-danger">
+            <div *ngIf="lastNameInput.errors?.['required']">Prezime je obavezno.</div>
+            <div *ngIf="lastNameInput.errors?.['minlength']">Prezime mora imati barem 4 karaktera.</div>
+            <div *ngIf="lastNameInput.errors?.['pattern']">Prezime može sadržavati samo slova.</div>
+          </div>
+        </div>
+
+
+
+        <div class="mb-3">
+          <label for="BirthDate" class="form-label">Datum Rođenja</label>
+          <input type="date" class="form-control" id="BirthDate" name="BirthDate" [(ngModel)]="birthDate" required >
+          <div *ngIf="!birthDate" class="text-danger">
+            Datum rođenja mora biti unesen.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="Position" class="form-label">Pozicija</label>
+          <select class="form-control" id="Position" name="Position" [(ngModel)]="position" required>
+            <option *ngFor="let pos of playerPositions" [value]="pos">{{ pos }}</option>
+          </select>
+          <div *ngIf="!position" class="text-danger">
+            Morate izabrati poziciju.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="ClubId" class="form-label">Klub</label>
+          <select class="form-control" id="ClubId" name="ClubId" [(ngModel)]="club" required>
+            <option *ngFor="let club of clubs" [value]="club.id">{{ club.name }}</option>
+          </select>
+          <div *ngIf="!club" class="text-danger">
+            Morate izabrati klub.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="imageUpload" class="form-label">Dodaj sliku</label>
+          <input
+            type="file"
+            id="imageUpload"
+            class="form-control"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+          />
+        </div>
+
+        <!-- Pregled slike -->
+        <!-- Prikazivanje odabrane slike i cropper -->
+        <div *ngIf="imagePreview" class="mb-3">
+          <p>Pregled slike:</p>
+
+          <!-- Prikazivanje croppera za sliku -->
+
+          <button
+            type="button"
+            class="btn btn-danger mt-2"
+            (click)="removeImage()"
+          >
+            Ukloni sliku
+          </button>
+        </div>
+
+        <div
+          class="drag-drop-area"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          [class.dragging]="isDragging"
+        >
+          <p *ngIf="!selectedImage">Povucite i otpustite sliku ovdje ili kliknite za odabir.</p>
+          <img *ngIf="selectedImage" [src]="imagePreview" alt="Preview slike" class="image-preview" />
+
+          <input
+            type="file"
+            (change)="onFileSelect($event)"
+            class="file-input"
+            accept="image/*"
+            hidden
+            #fileInput
+          />
+          <button type="button" (click)="fileInput.click()">Odaberite sliku</button>
+        </div>
+
+
+        <div *ngIf="isUploading" class="progress-bar-container">
+          <div
+            class="progress-bar"
+            [style.width.%]="uploadProgress"
+          ></div>
+        </div>
+        <p *ngIf="isUploading">Upload u toku... {{ uploadProgress }}%</p>
+
+        <div class="mb-3 captcha-container">
+          <label class="form-label">Captcha:</label>
+          <canvas id="captchaCanvas" width="200" height="50" class="mb-3"></canvas>
+
+          <!-- Refresh button -->
+          <button type="button" class="btn-refresh" (click)="generateCaptcha()">🔄 Osvježi</button>
+
+          <input
+            type="text"
+            class="form-control mt-2"
+            id="captchaInput"
+            [(ngModel)]="captchaInput"
+            [ngModelOptions]="{standalone: true}"
+            required
+            placeholder="Unesite Captcha tekst">
+
+          <!-- Alert message -->
+          <div *ngIf="captchaInput && captchaInput !== captchaText" class="text-danger mt-2">
+            Unos captcha nije tačan.
+          </div>
+        </div>
+
+        <button
+          *ngIf="!isEditing"
+          type="submit"
+          class="btn btn-primary"
+          (click)="addPlayer()">Spremi</button>
+
+        <button
+          *ngIf="isEditing"
+          type="submit"
+          class="btn btn-primary"
+          (click)="updatePlayer()">Spremi Izmjene</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="resetForm()">Otkaži</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+

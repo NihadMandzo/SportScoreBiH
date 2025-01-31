@@ -1,0 +1,89 @@
+  <form #newsForm="ngForm" (ngSubmit)="news ? updateNews() : addNews()">
+    <!-- Title Field -->
+    <div class="form-group">
+      <label for="title">Title:</label>
+      <input
+        type="text"
+        id="title"
+        [(ngModel)]="title"
+        name="title"
+        class="form-control"
+        [ngClass]="{ 'is-invalid': titleError }"
+        placeholder="Title"
+      />
+      <div *ngIf="titleError" class="validation-error">
+        {{ titleError }}
+      </div>
+    </div>
+  
+    <div class="form-group">
+      <label for="content">Content:</label>
+      <textarea
+        id="content"
+        [(ngModel)]="content"
+        name="content"
+        class="form-control"
+        [ngClass]="{ 'is-invalid': contentError }"
+        placeholder="Content"
+        rows="5"
+      ></textarea>
+      <div *ngIf="contentError" class="validation-error">
+        {{ contentError }}
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Select Clubs:</label>
+      <div class="select-wrapper">
+        <select multiple [(ngModel)]="selectedClubs" name="clubs" class="club-select">
+          <option *ngFor="let club of clubs" [value]="club.id">{{ club.name }}</option>
+        </select>
+        <button type="button" class="remove-button" (click)="removeAllClubs()">Remove Selected Clubs</button>
+      </div>
+    </div>
+  
+    <!-- Existing Pictures Section -->
+    <div *ngIf="existingPictureUrls.length > 0" class="form-group">
+    <h4>Existing Pictures</h4>
+    <div class="image-grid">
+      <div *ngFor="let picture of existingPictureUrls; let i = index" class="image-item">
+        <img [src]="picture.url" alt="Existing Image" />
+        <button type="button" (click)="removeExistingPicture(picture.url)" class="remove-picture">X</button>
+      </div>
+    </div>
+  </div>
+  
+    <!-- New Pictures Section -->
+    <div class="form-group">
+      <div
+    class="drag-drop-area"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    [class.drag-over]="isDragOver"
+  >
+    <p>Drag and drop pictures here, or click to upload</p>
+    <input type="file" (change)="onFileSelected($event)" multiple />
+  </div>
+      </div>
+      <div *ngIf="previewUrls.length > 0" class="new-pictures-container">
+        <div class="image-grid">
+          <div *ngFor="let preview of previewUrls; let i = index" class="image-item">
+            <img [src]="preview" alt="New Image Preview" />
+            <button type="button" (click)="removeNewPicture(i)" class="remove-picture">X</button>
+          </div>
+        </div>
+      </div>
+  
+    <!-- Action Buttons -->
+    <button
+      type="submit"
+      class="btn-primary"
+      [disabled]="
+        newsForm.invalid || 
+        (existingPictureUrls.length === 0 && newPictures.length === 0)"
+        >{{ news ? 'Update' : 'Add' }} News
+    </button>
+    <button type="button" (click)="cancel()" class="btn-secondary">Close</button>
+  </form>
+  
+  

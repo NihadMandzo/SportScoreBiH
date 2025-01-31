@@ -1,0 +1,50 @@
+<div class="login-container">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <h2>Prijava</h2>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input
+        type="email"
+        id="email"
+        class="form-control"
+        formControlName="email"
+        placeholder="Unesite vaš email"
+        required
+      />
+      <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
+        Unesite validan email
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Lozinka</label>
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        formControlName="password"
+        placeholder="Unesite vašu lozinku"
+        required
+      />
+      <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
+        Unesite lozinku
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid">Prijavi se</button>
+
+    <div class="line-container">
+      <hr class="line" />
+      <span class="or-text">ILI</span>
+      <hr class="line" />
+    </div>
+
+    <button type="button" class="btn btn-facebook w-100">Prijavi se preko Facebook-a</button>
+    <button type="button" class="btn btn-google w-100 mt-2">Prijavi se preko Google-a</button>
+
+    <div class="mt-3 text-center">
+      <p>Zaboravili ste lozinku? <a routerLink="/reset">Obnovi lozinku</a></p>
+    </div>
+  </form>
+</div>

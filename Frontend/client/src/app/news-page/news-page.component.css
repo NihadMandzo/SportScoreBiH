@@ -1,0 +1,403 @@
+.FullBody {
+  display: block;
+  height: 90vh; /* Full viewport height */
+  width: 100%;
+}
+
+.Top {
+  margin-left: 1700px;
+  margin-top: 100px;
+  border: 1px solid black;
+  width: 200px;
+}
+
+.MiddleLeft {
+  width: 200px;
+}
+
+.Middle {
+  display: flex;
+  flex-direction: row;
+  height: 80%;
+}
+
+.MiddleCenter {
+  height: 100%;
+  width: 70%;
+  margin-left: 60px;
+  display: flex;
+  flex-direction: row;
+}
+
+.MiddleRight {
+  border: 1px solid black;
+  width: 15%;
+  margin-top: 100px;
+  margin-left: 50px;
+}
+
+.AllNews {
+  box-sizing: border-box;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 5px;
+  padding-right: 20px;
+  align-content: flex-start
+}
+
+.AllNews::-webkit-scrollbar {
+  display: none;
+}
+
+.news-item {
+  flex: 0 0 calc(50% - 3px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 20%;
+
+}
+
+
+.news-item:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.news-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.AllNewsTitle{
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.AllNewsContent{
+  font-size: 1rem;
+}
+
+.news-item img {
+  max-width: 100px;
+  max-height: 100px;
+  min-width: 100px;
+  min-height: 100px;
+  object-fit:scale-down;
+}
+
+.loading-indicator {
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* Carousel CSS */
+.NewsCarousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.prev-btn,
+.next-btn {
+  background-color: #0c9521;
+  color: white;
+  border: none;
+  width: 38px;
+  height: 28px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.prev-btn:hover,
+.next-btn:hover {
+  background-color: #555;
+  transform: scale(1.1);
+}
+
+.prev-btn:active,
+.next-btn:active {
+  transform: scale(0.9);
+}
+
+.CarouselPictures {
+  overflow: hidden;
+  width: 100%;
+  max-width: 600px;
+  height: 80px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.carousel-container {
+  display: flex;
+  scroll-snap-type: x mandatory;
+  gap: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 15px;
+}
+
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-slide {
+  padding: 5px;
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+}
+
+.carousel-image{
+  max-width: 50px;
+  max-height: 50px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.additional-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  box-sizing: border-box;
+  max-height: 90%;
+}
+.additional-content::-webkit-scrollbar{
+  display: none;
+}
+.carousel-container-wrapper{
+  width: 25%;
+  border: 1px solid black;
+  border-radius: 20px;
+  background-color:#fafafa ;
+  border-color: #555;
+}
+.carousel-image:hover {
+  transform: scale(1.1);
+}
+
+.news-club-item {
+  display: flex;
+  align-items:center;
+  justify-content:left;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  margin: 2px;
+  display: flex;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.news-club-item img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 20px;
+}
+
+.news-club-item:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+.newstitle{
+  font-size: 15px;
+  font-weight: bold;
+  text-align: left;
+}
+.newscontent{
+  font-size: 10px;
+  text-align: left;
+}
+
+/* Stil za dugme AI widgeta */
+.AIWidgetButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #0078ff;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  text-align: center;
+  z-index: 1000;
+  transition: background-color 0.3s;
+}
+
+.AIWidgetButton:hover {
+  background-color: #005bb5;
+}
+
+/* Stil za iskačući prozor */
+.AIWidgetPopup {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 300px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Zaglavlje widgeta */
+.AIWidgetHeader {
+  background-color: #0078ff;
+  color: white;
+  padding: 10px;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.CloseButton {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Tijelo widgeta */
+.AIWidgetBody {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.AIInput {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.AISubmit {
+  background-color: #0078ff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.AISubmit:hover {
+  background-color: #005bb5;
+}
+
+.AIResponse {
+  white-space: pre-wrap; /* Održava formatiranje teksta (novi redovi) */
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.AIResponseContainer {
+  max-height: 300px; /* Maksimalna visina kontejnera */
+  overflow-y: auto;  /* Omogućava vertikalno skrolovanje */
+  border: 1px solid #ccc; /* Opcionalno: okvir oko odgovora */
+  padding: 10px; /* Prostor između teksta i ivica */
+  background-color: #f9f9f9; /* Svijetla pozadina */
+  border-radius: 5px;
+}
+/* Animacija za iskačući widget */
+@keyframes slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.SearchBar {
+  position: relative;
+  margin-left: 200px;
+  display: inline-block;
+}
+
+.SearchInput {
+  width: 300px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.SearchButton {
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.SearchButton:hover {
+  background-color: #0056b3;
+}
+
+.SearchPredictions {
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+  position: absolute;
+  width: 300px;
+  max-width: 100%;
+  z-index: 10;
+  margin-top: 5px;
+  left: 0;
+}
+
+.SearchPredictions ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.SearchPredictions li {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.SearchPredictions li:hover {
+  background-color: #f0f0f0;
+}
