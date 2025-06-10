@@ -14,7 +14,7 @@ export const jwtInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const loadingService = inject(LoadingServiceService);
 
-  // Get tokens from localStorage
+
   let accessToken = localStorage.getItem('accessToken');
   const refreshToken = localStorage.getItem('refreshToken');
 
@@ -44,7 +44,7 @@ export const jwtInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
           loadingService.showLoading();
 
 
-          // Refresh the token
+
           return loginService.refreshToken(refreshToken).pipe(
             switchMap((response: any) => {
               console.log('Token refreshed successfully:', response);
@@ -57,17 +57,16 @@ export const jwtInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
                 throw new Error('Tokens are missing in the response.');
               }
 
-              // Save new tokens
+
               localStorage.setItem('accessToken', newAccessToken);
               localStorage.setItem('refreshToken', newRefreshToken);
 
-              // Set timeout to prevent repeated refresh requests
               refreshTimeout = setTimeout(() => {
                 isRefreshing = false;
                 loadingService.hideLoading();
-              }, 3000); // 30 seconds
+              }, 3000);
 
-              // Retry the original request
+              
               const clonedReq = req.clone({
                 setHeaders: {
                   Authorization: `Bearer ${newAccessToken}`,
@@ -88,7 +87,7 @@ export const jwtInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
           );
         } else {
           console.log('Refresh token request already in progress. Delaying...');
-          // Wait for the timeout to expire before making another request
+
           return timer(3000).pipe(
             switchMap(() => next(req))
           );
@@ -102,7 +101,7 @@ export const jwtInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
     }
   }
 
-  // Add the access token to the request headers if it exists
+
   const clonedReq = req.clone({
     setHeaders: {
       Authorization: `Bearer ${accessToken || ''}`,

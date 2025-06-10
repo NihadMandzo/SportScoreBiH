@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-confirm-email',
   templateUrl: './confirm-email.component.html',
   standalone: true,
+  imports: [NgIf],
   styleUrls: ['./confirm-email.component.css']
 })
 export class ConfirmEmailComponent implements OnInit {

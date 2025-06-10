@@ -30,7 +30,7 @@
 }
 
 .mat-mdc-row {
-  height: 100px !important; /* Set a constant height for each row */
+  height: 100px !important; 
 }
 
 .mat-mdc-cell {
@@ -67,7 +67,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-height: 2.8em; /* Adjust based on your font size and line height */
+  max-height: 2.8em; 
   line-height: 1.4em;
 }
 
@@ -117,5 +117,18 @@ button {
   justify-content: center;
   border-radius: 10px;
   
+}
+
+.clubs-scroll {
+  max-width: 180px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.clubs-scroll-inner {
+  display: flex;
+  gap: 4px;
+}
+.club-tag {
+  white-space: nowrap;
 }
 

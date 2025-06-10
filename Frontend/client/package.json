@@ -37,6 +37,7 @@
     "jwt-decode": "^4.0.0",
     "ng-bootstrap": "^1.6.3",
     "ngx-captcha": "^13.0.0",
+    "ngx-image-zoom": "^3.0.0",
     "ngx-infinite-scroll": "^19.0.0",
     "ngx-mask": "^18.0.4",
     "rxjs": "~7.8.0",

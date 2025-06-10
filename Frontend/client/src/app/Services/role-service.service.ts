@@ -4,19 +4,24 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class RoleServiceService {
- // Get the user's role from localStorage
+
  getRole(): string {
-  return localStorage.getItem('userRole') || 'Guest'; // Default to Guest
+  return localStorage.getItem('userRole') || 'Guest';
 }
 
-// Check if the user is an admin
+
 isAdmin(): boolean {
-  return this.getRole() === 'admin';
+  const role = this.getRole();
+  return role.toLowerCase() === 'admin';
 }
-isUser() : boolean {
-  return this.getRole()==='User';
+
+isUser(): boolean {
+  const role = this.getRole();
+  return role.toLowerCase() === 'user';
 }
-isGuest() :boolean{
-  return this.getRole()==='Guest';
+
+isGuest(): boolean {
+  const role = this.getRole();
+  return role.toLowerCase() === 'guest';
 }
 }

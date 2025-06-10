@@ -1,5 +1,5 @@
   <form #newsForm="ngForm" (ngSubmit)="news ? updateNews() : addNews()">
-    <!-- Title Field -->
+
     <div class="form-group">
       <label for="title">Title:</label>
       <input
@@ -41,7 +41,7 @@
       </div>
     </div>
   
-    <!-- Existing Pictures Section -->
+
     <div *ngIf="existingPictureUrls.length > 0" class="form-group">
     <h4>Existing Pictures</h4>
     <div class="image-grid">
@@ -52,7 +52,7 @@
     </div>
   </div>
   
-    <!-- New Pictures Section -->
+
     <div class="form-group">
       <div
     class="drag-drop-area"
@@ -74,7 +74,7 @@
         </div>
       </div>
   
-    <!-- Action Buttons -->
+
     <button
       type="submit"
       class="btn-primary"

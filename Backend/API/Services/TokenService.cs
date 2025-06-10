@@ -12,7 +12,6 @@ namespace API.Services;
 public class TokenService
 {
     private readonly IConfiguration _config;
-
     public TokenService(IConfiguration config)
     {
         _config = config;
@@ -23,16 +22,16 @@ public class TokenService
         var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),
-                 new Claim("role", user.Role),
+                new Claim("role", user.Role),
                 new Claim("Username", user.UserName),
                 new Claim("UserId", user.ID.ToString()),
-                new Claim("ClubId", user.ClubID.ToString())
+                new Claim("ClubId", user.ClubID?.ToString() ?? "0")
             };
 
-        if (user.Role == "Admin")
+        if (user.Role == "Admin" && user is Admin adminUser)
         {
-            claims.Add(new Claim("FirstName", ((Admin)user).FirstName));
-            claims.Add(new Claim("LastName", ((Admin)user).LastName));
+            claims.Add(new Claim("FirstName", adminUser.FirstName));
+            claims.Add(new Claim("LastName", adminUser.LastName));
         }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:SecretKey"]));

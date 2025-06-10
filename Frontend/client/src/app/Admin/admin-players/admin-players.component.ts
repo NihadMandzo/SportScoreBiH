@@ -4,7 +4,7 @@ import { AdminNavBarComponent } from "../admin-nav-bar/admin-nav-bar.component";
 @Component({
   selector: 'app-admin-players',
   standalone: true,
-  imports: [AdminNavBarComponent],
+  imports: [],
   templateUrl: './admin-players.component.html',
   styleUrl: './admin-players.component.css'
 })

@@ -10,7 +10,7 @@ export interface NewsDTO {
   dateTime: string;
   admin: AdminDTO;
   clubs: Club[];
-  pictures: string[]; // Array of URLs instead of objects
+  pictures: string[]; 
 }
 
 
@@ -44,9 +44,9 @@ export class NewsService {
   }
 
   addNews(news: FormData): Observable<NewsDTO> {
-    const token = localStorage.getItem('accessToken'); // Retrieve the token from localStorage
+    const token = localStorage.getItem('accessToken'); 
 
-    // Set the Authorization header
+
     const headers = {
       Authorization: `Bearer ${token}`,
     };
@@ -54,9 +54,8 @@ export class NewsService {
   }
 
   deleteNews(newsId: number): Observable<void> {
-    const token = localStorage.getItem('accessToken'); // Retrieve the token from localStorage
+    const token = localStorage.getItem('accessToken'); 
 
-    //Set the Authorization header
     const headers = {
       Authorization: `Bearer ${token}`,
     };
@@ -64,9 +63,9 @@ export class NewsService {
   }
 
   updateNews(id: number, news: FormData): Observable<NewsDTO> {
-    const token = localStorage.getItem('accessToken'); // Retrieve the token from localStorage
+    const token = localStorage.getItem('accessToken');
 
-    // Set the Authorization header
+
     const headers = {
       Authorization: `Bearer ${token}`,
     };
@@ -82,7 +81,7 @@ export class NewsService {
   getNewsByClub(clubID: number, pageNumber: number, pageSize: number):Observable<PagedResult<NewsDTO>> {
     return this.http.get<PagedResult<NewsDTO>>(`${this.baseUrl}News/by-club/${clubID}?pageNumber=${pageNumber}&pageSize=${pageSize}`);
   }
-  // Funkcija koja vraća prediktivne vijesti na osnovu unosa
+
   getSearchPredictions(query: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}News/search/predictions?query=${query}`);
   }

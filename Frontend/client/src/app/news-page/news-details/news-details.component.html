@@ -1,11 +1,12 @@
 <div class="news-layout">
   <!-- Go Back Button -->
-  <button class="go-back-button" (click)="goBack()">‹ Povratak</button>
 
   <!-- Left Container: Title, Image, and Content -->
   <div class="news-main-container">
     <!-- Title -->
     <div class="news-title">
+      <button class="go-back-button" (click)="goBack()">‹ Povratak</button>
+
       <h1>{{ newsDetails.title }}</h1>
     </div>
 
@@ -21,11 +22,14 @@
             *ngFor="let picture of newsDetails.pictures"
             class="carousel-slide"
           >
-            <img
-              [src]="picture || 'https://via.placeholder.com/150'"
-              alt="News Image"
-              (click)="openImageModal(picture!)"
-            />
+            <lib-ngx-image-zoom
+              [thumbImage]="picture"
+              [fullImage]="picture"
+              [enableLens]="true"
+              [lensWidth]="200"
+              [lensHeight]="200"
+              [magnification]="2">
+            </lib-ngx-image-zoom>
           </div>
         </div>
 
@@ -56,7 +60,10 @@
 
     <!-- Content -->
     <div class="news-content">
-      <p>{{ newsDetails.content }}</p>
+      <ng-container *ngFor="let paragraph of contentParagraphs">
+        <p>{{ paragraph }}</p>
+        <br />
+      </ng-container>
     </div>
   </div>
 

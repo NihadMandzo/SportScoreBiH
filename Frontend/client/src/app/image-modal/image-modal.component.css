@@ -41,7 +41,7 @@
     max-height: 100% !important;
     object-fit: contain !important; /* Zadržavanje proporcija */
     transition: transform 0.25s ease, translate 0.25s ease; /* Glatke transformacije */
-    cursor: grab; /* Prikaz ikone ruke za pomicanje */
+    cursor: zoom; /* Prikaz ikone ruke za pomicanje */
     position: relative;
   }
   

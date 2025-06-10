@@ -167,12 +167,11 @@ namespace API.Controllers.AuthController
         {
             Console.WriteLine("Refresh token endpoint hit.");
             Console.WriteLine($"Received token: {refreshTokenDto.Token}");
-            // Extract the refresh token from the DTO
             var refreshToken = refreshTokenDto.Token;
 
             Console.WriteLine($"Incoming refresh token: {refreshToken}");
 
-            // Check if the refresh token exists and is not revoked
+
             var tokenEntity = await _context.RefreshToken
                 .FirstOrDefaultAsync(rt => rt.Token == refreshToken && !rt.IsRevoked);
 
@@ -182,14 +181,14 @@ namespace API.Controllers.AuthController
                 return Unauthorized("Invalid or expired refresh token.");
             }
 
-            // Check if the token is expired
+
             if (tokenEntity.ExpirationDate < DateTime.UtcNow)
             {
                 Console.WriteLine("Refresh token is expired.");
                 return Unauthorized("Invalid or expired refresh token.");
             }
 
-            // Retrieve the associated user
+
             var user = await _context.User.FindAsync(tokenEntity.UserId);
             if (user == null)
             {
@@ -199,17 +198,16 @@ namespace API.Controllers.AuthController
 
             Console.WriteLine($"User found: {user.UserName}");
 
-            // Generate new access and refresh tokens
+
             var newAccessToken = _tokenService.GenerateAccessToken(user);
             var newRefreshToken = _tokenService.GenerateRefreshToken();
 
             Console.WriteLine($"Generated new access token: {newAccessToken}");
             Console.WriteLine($"Generated new refresh token: {newRefreshToken}");
 
-            // Revoke the old refresh token
             tokenEntity.IsRevoked = true;
 
-            // Save the new refresh token
+
             var newRefreshTokenEntity = new RefreshToken
             {
                 Token = newRefreshToken,
@@ -219,7 +217,7 @@ namespace API.Controllers.AuthController
 
             _context.RefreshToken.Add(newRefreshTokenEntity);
 
-            // Save changes to the database
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -231,7 +229,7 @@ namespace API.Controllers.AuthController
                 return StatusCode(500, "Internal server error. Please try again.");
             }
 
-            // Return the tokens to the client
+
             var response = new TokenDTO
             {
                 AccessToken = newAccessToken,
@@ -254,10 +252,10 @@ namespace API.Controllers.AuthController
                 return Unauthorized("Invalid username or email.");
             }
 
-            //if (user.IsEmailConfirmed != true)
-            //{
-            //    return Unauthorized("Molimo da potvrdite vaš email!!");
-            //}
+            if (user.IsEmailConfirmed != true)
+            {
+               return Unauthorized("Molimo da potvrdite vaš email!!");
+            }
 
             using var hmac = new HMACSHA512(user.PasswordSalt);
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
@@ -270,16 +268,14 @@ namespace API.Controllers.AuthController
                 }
             }
 
-            // Generating access and refresh tokens
             var accessToken = _tokenService.GenerateAccessToken(user);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
-            // Save refresh token in db
             var refreshTokenEntity = new RefreshToken
             {
                 Token = refreshToken,
                 UserId = user.ID,
-                ExpirationDate = DateTime.UtcNow.AddMinutes(15)
+                ExpirationDate = DateTime.UtcNow.AddMinutes(100)
             };
 
             _context.RefreshToken.Add(refreshTokenEntity);
@@ -356,11 +352,6 @@ namespace API.Controllers.AuthController
             await _context.SaveChangesAsync();
             return Ok(new { message = "Profil uspješno ažuriran." });
         }
-
-
-
-
-
 
         [HttpDelete("delete-profile/{userId}")]
         [Authorize]

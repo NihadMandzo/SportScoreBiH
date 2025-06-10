@@ -10,13 +10,13 @@ import { RegisterComponent } from "../register-form/register-form.component";
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [RouterLink,
+  imports: [
     MatSlideToggleModule, FormsModule,
     LoginFormComponent, NgIf, RegisterComponent],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css',
 
-  //For angular animations and smooth transition
+
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
@@ -54,27 +54,26 @@ export class LandingPageComponent {
   }
 
   showLoginForm() {
-    // //this.router.navigate(['/login']);
+
 
 
     this.showLoginFormComponent=true;
     this.showRegisterFormComponent=false;
-    //this.router.navigate(['/login-form']);
   }
 
   showRegisterForm() {
-    // console.log("Opening Register Form...");
+
     this.showRegisterFormComponent=true;
     this.showLoginFormComponent=false;
 
   }
 
   navigateToLogin() {
-    this.showLoginFormComponent = true; // Prikazuje login formu
+    this.showLoginFormComponent = true;
     this.showRegisterFormComponent = false;
   }
 
   ContinueAsGuest(){
-    this.router.navigate(['/news-page']);
+    this.router.navigate(['/user/news']);
   }
 }

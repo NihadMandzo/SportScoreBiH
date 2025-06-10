@@ -20,42 +20,33 @@ import {ResetPasswordComponent} from './reset-password/reset-password.component'
 import {SetNewPasswordComponent} from './set-new-password/set-new-password.component';
 import {userAndAdminGuardGuard} from './Guards/user-and-admin-guard.guard';
 import {guestUserGuard} from './Guards/guest-user.guard';
-// import { VijestiComponent } from './user/vijesti/vijesti.component';
-// import { RezultatiComponent } from './user/rezultati/rezultati.component';
-// import { KlubComponent } from './user/klub/klub.component';
-// import { RegisterComponent } from './authentication-authorization/register/register.component';
 
 export const routes: Routes = [
-        {path:'news-page', component:NewsPageComponent},
-        {path:'admin-navbar', component:AdminNavBarComponent},
-        {path:'club/:id', component:ClubPageComponent, canActivate:[clubGuardGuard]},
-        {path:'results', component:ResultsPageComponent, canActivate:[userGuardGuard]},
-        {path:'login-form',component:LoginFormComponent},
-        {path:'app-player',component:PlayerComponent, canActivate:[adminGuardGuard]},
-        {path:'confirm-email',component:ConfirmEmailComponent},
-        {path:'reset',component:ResetPasswordComponent},
-        {path:'reset-password',component:SetNewPasswordComponent},
-        {path: 'news/:id', component:NewsDetailsComponent},
-        {path:'profile',component:ProfileComponent,canActivate:[userAndAdminGuardGuard]},
-        {
-            path: '',
-            component:LandingPageComponent,
-            children: [
-              { path: 'admin-news', component: AdminNewsComponent },
-              { path: 'admin-players', component: PlayerComponent },
-            ],
-          },
-        {path:'add-news', component:SingleNewsComponent},
+  { path: 'login', component: LoginFormComponent, canActivate: [guestUserGuard] },
+  { path: 'register', component: RegisterComponent, canActivate: [guestUserGuard] },
+  { path: 'confirm-email', component: ConfirmEmailComponent },
+  { path: 'reset', component: ResetPasswordComponent },
+  { path: 'reset-password', component: SetNewPasswordComponent },
+  
 
-        {path:'edit-news/:id', component:SingleNewsComponent}
+  {
+    path: 'admin',
+    loadChildren: () => import('./Admin/admin.module').then(m => m.AdminModule),
+    canActivate: [adminGuardGuard]
+  },
+  
 
+  {
+    path: 'user',
+    loadChildren: () => import('./user.module').then(m => m.UserModule),
+    canActivate: [guestUserGuard]
+  },
+  
 
-    // {path:'vijesti', component:VijestiComponent},
-    // {path:'rezultati', component:RezultatiComponent},
-    // {path:'klub', component:KlubComponent},
-    // {path:'register', component:RegisterComponent},
-    // {path:'login', component:VijestiComponent},
-    // {path:'home-page', component:VijestiComponent},
+  { path: '', component: LandingPageComponent },
+  
+
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

@@ -24,41 +24,74 @@ export class LoginFormComponent {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      this.loginService.login(this.loginForm.value).subscribe(
-        (response) => {
+      console.log('Form submitted with values:', this.loginForm.value);
+      
+      this.loginService.login(this.loginForm.value).subscribe({
+        next: (response) => {
+          console.log('Login response:', response);
+          
           const token = response.accessToken;
           const refreshToken = response.refreshToken;
 
-          try {
-            const decodedToken: any = jwtDecode(token); // Dekodiraj token
-            console.log('Decoded Token:', decodedToken); // Ispisuje cijeli token da provjeriš njegov sadržaj
+          if (!token) {
+            console.error('No access token received');
+            alert('Greška: Nije primljen token za pristup.');
+            return;
+          }
 
-            const userRole = decodedToken.role;
-            const clubId = decodedToken.ClubId; // Ako koristiš ClubId
-            const userID = decodedToken.UserId;  // Pravilno dekodiraj UserId (provjeri ime ključa)
+          try {
+            const decodedToken: any = jwtDecode(token);
+            console.log('Decoded Token:', decodedToken);
+
+            const userRole = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decodedToken.role;
+            const clubId = decodedToken.ClubId;
+            const userID = decodedToken.UserId;
+
+            console.log('User Role:', userRole);
+            console.log('Club ID:', clubId);
+            console.log('User ID:', userID);
 
             localStorage.setItem('accessToken', token);
             localStorage.setItem('refreshToken', refreshToken);
-            localStorage.setItem('userID', userID);  // Pohrani userID
+            localStorage.setItem('userID', userID);
             localStorage.setItem('userRole', userRole);
 
             // Redirektaj korisnika na odgovarajući URL na temelju role
-            if (userRole === 'Admin') {
-              this.router.navigate(['/admin-navbar']);
+            if (userRole.toLowerCase() === 'admin') {
+              console.log('User is admin, attempting to navigate to admin page...');
+              this.router.navigate(['/admin']).then(success => {
+                if (!success) {
+                  console.error('Failed to navigate to admin page');
+                  console.log('Current role in localStorage:', localStorage.getItem('userRole'));
+                  alert('Greška pri preusmjeravanju na admin stranicu.');
+                } else {
+                  console.log('Successfully navigated to admin page');
+                }
+              });
             } else {
-              this.router.navigate(['/news-page']);
+              console.log('User is not admin, attempting to navigate to user page...');
+              this.router.navigate(['/user']).then(success => {
+                if (!success) {
+                  console.error('Failed to navigate to user page');
+                  console.log('Current role in localStorage:', localStorage.getItem('userRole'));
+                  alert('Greška pri preusmjeravanju na stranicu korisnika.');
+                } else {
+                  console.log('Successfully navigated to user page');
+                }
+              });
             }
           } catch (error) {
             console.error('Error decoding token:', error);
             alert('Došlo je do pogreške pri dekodiranju tokena.');
           }
         },
-        (error) => {
+        error: (error) => {
           console.error('Login failed:', error);
           alert('Neuspješna prijava. Provjerite email i lozinku.');
         }
-      );
+      });
+    } else {
+      console.log('Form is invalid:', this.loginForm.errors);
     }
   }
-
 }

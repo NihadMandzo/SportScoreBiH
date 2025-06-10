@@ -92,5 +92,6 @@ export class ImageModalComponent {
 
   stopDragging(): void {
     this.dragging = false;
-  }
+  }  
 }
+  

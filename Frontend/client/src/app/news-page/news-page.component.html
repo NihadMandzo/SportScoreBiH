@@ -1,127 +1,144 @@
-<div class="FullBody">
-  <div class="Top">
-    <div>Vremenska prognoza</div>
+<div class="news-container">
+  <div class="all-news">
+    <div class="news-main-area">
+
+      <section class="news-grid" #newsGrid>
+        <div class="news-cards"
+             infiniteScroll
+             [infiniteScrollDistance]="1"
+             [infiniteScrollThrottle]="1000"
+             [scrollWindow]="false"
+             [infiniteScrollContainer]="newsGrid"
+             (scrolled)="onScroll()">
+          <article *ngFor="let news of newsList" 
+                   class="news-card"
+                   (click)="NavigateToDetails(news.id || 0)">
+            <div class="card-image">
+              <img [src]="news.pictures[0]" [alt]="news.title">
+            </div>
+            <div class="card-content">
+              <h3>{{ news.title }}</h3>
+              <p>{{ news.content | slice:0:140 }}...</p>
+              <div class="card-meta">
+                <span class="date">Danas</span>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div *ngIf="loading" class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>Učitavanje novih vijesti...</span>
+        </div>
+      </section>
+    </div>
   </div>
-  <div class="Middle">
-    <div class="MiddleLeft">
-      <app-navbar></app-navbar>
-
-    </div>
-    <div class="SearchBar">
-      <input
-        type="text"
-        class="SearchInput"
-        placeholder="Pretražite vijesti..."
-        [(ngModel)]="searchQuery"
-        (input)="onSearch()"
-      />
-      <button class="SearchButton">Pretraži</button>
-      <div *ngIf="predictions.length > 0" class="SearchPredictions" >
-        <ul>
-          <li *ngFor="let prediction of predictions" (click)="selectPrediction(prediction)">
-            {{ prediction.title }}
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="MiddleCenter">
-
-      <div
-        class="AllNews"
-        infiniteScroll
-        [infiniteScrollDistance]="1"
-        [infiniteScrollThrottle]="100"
-        (scroll)="onScroll()"
-      >
-        <div
-          *ngFor="let news of newsList"
-          class="news-item"
-          (click)="news.id ? NavigateToDetails(news.id) : null"
+  <div class="right-container">
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+          placeholder="Pretraži vijesti..."
+          class="search-input"
         >
-          <img [src]="news.pictures[0]" alt="News Image" />
-          <div class="news-content">
-            <div class="AllNewsTitle">
-              {{ news.title | slice : 0 : 25
-              }}{{ news.title.length > 25 ? "..." : "" }}
-            </div>
-            <div class="AllNewsContent">
-              {{ news.content | slice : 0 : 39
-              }}{{ news.content.length > 39 ? "..." : "" }}
-            </div>
-          </div>
-        </div>
-        <div *ngIf="loading" class="loading-indicator">
-          <p>Loading...</p>
+        <button class="search-btn">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      <div *ngIf="predictions.length > 0" class="search-results">
+        <div *ngFor="let prediction of predictions" 
+             class="search-item"
+             (click)="selectPrediction(prediction)">
+          <i class="fas fa-newspaper"></i>
+          <span>{{ prediction.title }}</span>
         </div>
       </div>
-
-      <!-- Carousel -->
-      <div class="carousel-container-wrapper">
-        <div class="NewsCarousel">
-          <button class="prev-btn" (click)="scrollLeft()">
-          <</button>
-          <div class="CarouselPictures">
-            <div class="carousel-container" #carousel>
-              <div class="carousel-slide" *ngFor="let club of clubList">
-                <img [src]="club.pictureUrl" [alt]="club.name" class="carousel-image" (click)="LoadNewsByClubID(club.id)"/>
-              </div>
-            </div>
-          </div>
-          <button class="next-btn" (click)="scrollRight()">></button>
-        </div>
-        <div class="additional-content"
-        infiniteScroll
-        [infiniteScrollDistance]="1"
-        [infiniteScrollThrottle]="25"
-        (scroll)="onScrollClubs()">
-              <div *ngFor="let newsClub of newsByClub" class="news-club-item"
-              (click)="newsClub.id ? NavigateToDetails(newsClub.id) : null">
-                <img [src]="newsClub.pictures[0]" alt="News Image" />
-                <div class="news-content-club">
-                  <div class="newstitle">
-                    {{ newsClub.title | slice : 0 : 25
-                    }}{{ newsClub.title.length > 25 ? "..." : "" }}
-                  </div>
-                  <div class="newscontent">
-                    {{ newsClub.content | slice : 0 : 40
-                    }}{{ newsClub.content.length > 40 ? "..." : "" }}
-                  </div>
-                </div>
-              </div>
-          </div>
-      </div>
-      <!-- End of Carousel -->
-
     </div>
-    <div class="MiddleRight">ovdje ce biti tabela vazda</div>
-  </div>
-  <div class="Bottom"></div>
-</div>
+    <div class="club-news">
+      <div class="club-news-title">Vijesti po klubovima</div>
 
-<div class="AIWidgetButton" (click)="toggleAIWidget()">🤖 AI Widget</div>
+      <div class="club-carousel-outer">
+        <div class="carousel-arrow left">
+          <button class="nav-btn" (click)="scrollLeft()" [disabled]="carouselIndex === 0">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
+        <div class="carousel-center">
+          <div class="club-carousel" #carousel [style.marginLeft.px]="-carouselIndex * 65">
+            <div *ngFor="let club of clubList"
+                 class="club-item"
+                 [class.selected]="club.id === selectedClubId"
+                 (click)="LoadNewsByClubID(club.id || 0)">
+              <img [src]="club.pictureUrl" [alt]="club.name">
+              <span class="club-name">{{ club.name }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-arrow right">
+          <button class="nav-btn" (click)="scrollRight()" [disabled]="carouselIndex + 4 >= clubList.length">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
 
-<!-- Popup za AI Widget -->
-<div class="AIWidgetPopup" *ngIf="isAIWidgetOpen">
-  <div class="AIWidgetHeader">
-    <span>AI Pomoćnik</span>
-    <button class="CloseButton" (click)="toggleAIWidget()">✖</button>
-  </div>
 
-  <div class="AIWidgetBody">
-    <!-- Polje za unos korisnika -->
-    <textarea
-      class="AIInput"
-      [(ngModel)]="userInput"
-      placeholder="Postavite pitanje o historiji BH lige i pravilima fudbala..."
-    ></textarea>
+      <div class="club-news-list"
+           infiniteScroll
+           [infiniteScrollDistance]="1"
+           [infiniteScrollThrottle]="25"
+           (scroll)="onScrollClubs()">
+        <article *ngFor="let newsClub of newsByClub" 
+                 class="club-news-card"
+                 (click)="NavigateToDetails(newsClub.id || 0)">
+          <div class="club-card-image">
+            <img [src]="newsClub.pictures[0]" [alt]="newsClub.title">
+          </div>
+          <div class="club-card-content">
+            <h4>{{ newsClub.title }}</h4>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="ai-assistant">
+      <button class="ai-assistant-btn" (click)="toggleAIWidget()">
+        <i class="fas fa-robot"></i>
+        <span>AI Pomoćnik</span>
+      </button>
 
-    <!-- Dugme za slanje pitanja -->
-    <button class="AISubmit" (click)="askQuestion()">Pošaljite</button>
-
-    <!-- Prikaz odgovora od AI -->
-    <div class="AIResponseContainer" *ngIf="aiResponse">
-      <p><strong>AI Odgovor:</strong></p>
-      <div class="AIResponse">{{ aiResponse }}</div>
+    <div class="ai-widget" *ngIf="isAIWidgetOpen">
+      <div class="ai-widget-header">
+        <div class="ai-title">
+          <i class="fas fa-robot"></i>
+          <span>AI Pomoćnik</span>
+        </div>
+        <button class="close-btn" (click)="toggleAIWidget()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="ai-widget-body">
+        <textarea
+          class="ai-input"
+          [(ngModel)]="userInput"
+          placeholder="Postavite pitanje o historiji BH lige i pravilima fudbala..."
+        ></textarea>
+        
+        <button class="ai-submit" (click)="askQuestion()">
+          <i class="fas fa-paper-plane"></i>
+          <span>Pošalji</span>
+        </button>
+  
+        <div class="ai-response" *ngIf="aiResponse">
+          <div class="response-header">
+            <i class="fas fa-robot"></i>
+            <span>AI Odgovor</span>
+          </div>
+          <div class="response-content">
+            {{ aiResponse }}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -14,15 +14,15 @@ public class BlobService
         _containerClient.CreateIfNotExists();
     }
 
-    // Upload photo to blob storage
+
     public async Task<string> UploadPhotoAsync(Stream fileStream, string fileName)
     {
         var blobClient = _containerClient.GetBlobClient(fileName);
         await blobClient.UploadAsync(fileStream, overwrite: true);
-        return blobClient.Uri.ToString(); // Returns the Blob URL
+        return blobClient.Uri.ToString(); 
     }
 
-    // Delete photo from blob storage
+
     public async Task DeletePhotoAsync(string fileName)
     {
         var blobClient = _containerClient.GetBlobClient(fileName);

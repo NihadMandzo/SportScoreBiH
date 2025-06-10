@@ -14,8 +14,9 @@ import { Comment } from '../../Services/DTO/Comment';
 import { FormsModule } from '@angular/forms';
 import { jwtDecode } from 'jwt-decode';
 import { MatButtonModule } from '@angular/material/button';
-import { faThumbsUp, faThumbsDown } from '@fortawesome/free-solid-svg-icons';
+import { faThumbsUp, faThumbsDown, faUser, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import {QRCodeComponent} from 'angularx-qrcode';
+import { NgxImageZoomModule } from 'ngx-image-zoom';
 
 @Component({
   selector: 'app-news-details',
@@ -29,6 +30,7 @@ import {QRCodeComponent} from 'angularx-qrcode';
     FormsModule,
     MatButtonModule,
     QRCodeComponent,
+    NgxImageZoomModule
   ],
   templateUrl: './news-details.component.html',
   styleUrls: ['./news-details.component.css'], // Fixed 'styleUrls' typo
@@ -52,6 +54,8 @@ export class NewsDetailsComponent implements OnInit {
   faCopy = faCopy;
   faThumbsUp = faThumbsUp;
   faThumbsDown = faThumbsDown;
+  faUser = faUser;
+  faCalendar = faCalendar;
   isCopied = false;
   comments: Comment[] = []; // Holds the top 3 comments
   allComments: Comment[] = []; // Holds all comments for the dialog
@@ -135,24 +139,24 @@ export class NewsDetailsComponent implements OnInit {
 
   shareOnWhatsApp(): void {
     const url = window.location.href;
-    const message = `Pogledajte ovu vijest na platformi SportScoreBiH ${url}`; // Kombinacija teksta i URL-a
+    const message = `Pogledajte ovu vijest na platformi SportScoreBiH ${url}`; 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   }
 
   shareOnTwitter(): void {
     const text = encodeURIComponent('Pogledajte ovu vijest...');
-    const url = encodeURIComponent(window.location.href); // URL vaše stranice ili vesti
+    const url = encodeURIComponent(window.location.href); 
     const twitterUrl = `https://twitter.com/intent/tweet?text=${text}%20${url}`;
     window.open(twitterUrl, '_blank');
   }
 
   copyUrlToClipboard(): void {
-    const url = window.location.href; // Primer URL-a za kopiranje
+    const url = window.location.href; 
     navigator.clipboard.writeText(url).then(() => {
       this.isCopied = true;
 
-      // Resetujte status nakon 2 sekunde
+
       setTimeout(() => {
         this.isCopied = false;
       }, 2000);
@@ -264,30 +268,32 @@ export class NewsDetailsComponent implements OnInit {
     }
     this.router.navigate(['/login-form']); // Navigate to login component}
   }
-  reactToComment(commentId: number, isLike: boolean): void {
-    this.commentService.reactToComment(commentId, this.loggedInUserId, isLike).subscribe(
-      (response) => {
-        const updateReactionState = (commentsArray: Comment[]) => {
-          const comment = commentsArray.find((c) => c.id === commentId);
-          if (comment) {
-            // Update like and dislike counts from response
-            comment.like = response.like;
-            comment.dislike = response.dislike;
 
-            // Update userReaction field
-            comment.userReaction = isLike ? 'like' : 'dislike';
-          }
-        };
+    reactToComment(commentId: number, isLike: boolean): void {
+      this.commentService.reactToComment(commentId, this.loggedInUserId, isLike).subscribe(
+        (response) => {
+          // Prvo osvježimo sve komentare
+          this.loadComments();
+          
+          // Zatim ažuriramo trenutno stanje
+          const updateReactionState = (commentsArray: Comment[]) => {
+            const comment = commentsArray.find((c) => c.id === commentId);
+            if (comment) {
+              comment.like = response.like;
+              comment.dislike = response.dislike;
+              comment.userReaction = isLike ? 'like' : 'dislike';
+            }
+          };
+    
+          updateReactionState(this.comments);
+          updateReactionState(this.allComments);
+        },
+        (error) => {
+          console.error('Error reacting to comment:', error);
+        }
+      );
+    }
 
-        // Update both visible and dialog comments
-        updateReactionState(this.comments);
-        updateReactionState(this.allComments);
-      },
-      (error) => {
-        console.error('Error reacting to comment:', error);
-      }
-    );
-  }
 
   isReactionActive(comment: any, reactionType: 'like' | 'dislike'): boolean {
     return comment.userReaction === reactionType;
@@ -298,5 +304,11 @@ export class NewsDetailsComponent implements OnInit {
       return comment.userReaction;
     }
     return undefined;
+  }
+  get contentParagraphs(): string[] {
+    // Ako su paragrafe odvojene sa dvostrukim novim redom
+    return this.newsDetails.content
+      ? this.newsDetails.content.split(/\n\s*\n/)
+      : [];
   }
 }

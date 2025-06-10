@@ -6,6 +6,7 @@ using API.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace API.Controllers.AdminControllers;
 
@@ -31,6 +32,7 @@ public class NewsController : ControllerBase
         .Include(n => n.Admin)
         .Include(n => n.NewsPictures)
             .ThenInclude(np => np.Picture)
+        .OrderByDescending(n => n.DateTime)
         .Select(n => new NewsDTO
         {
             ID = n.ID,
@@ -49,8 +51,8 @@ public class NewsController : ControllerBase
                 Name = nc.Club.Name,
                 Info = nc.Club.Info
             }).ToList(),
-            Pictures = n.NewsPictures.Select(np => np.Picture.BlobUrl) // Flatten to list of URLs
-        })
+            Pictures = n.NewsPictures.Select(np => np.Picture.BlobUrl)     
+            }).OrderByDescending(n => n.DateTime)
         .ToArrayAsync();
 
         return Ok(newsList);
@@ -88,7 +90,7 @@ public class NewsController : ControllerBase
                 Name = nc.Club.Name,
                 Info = nc.Club.Info
             }).ToList(),
-            Pictures = news.NewsPictures.Select(np => np.Picture.BlobUrl).ToArray() // Flatten to list of URLs
+            Pictures = news.NewsPictures.Select(np => np.Picture.BlobUrl).ToArray() 
         };
 
         return Ok(newsDto);
@@ -96,6 +98,7 @@ public class NewsController : ControllerBase
     }
 
     [HttpGet("by-club/{clubId}")]
+
     public async Task<ActionResult<PagedResult<NewsDTO>>> GetNewsByClubId(int clubId, int pageNumber =1,int pageSize=10)
     {
         var query = _context.News
@@ -139,10 +142,36 @@ public class NewsController : ControllerBase
             Items = newsList,
         });
     }
-    //[Authorize(Roles = "Admin")]
+
+
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<NewsDTO>> CreateNews([FromForm] NewsCreateDTO newsCreateDTO)
     {
+
+        var adminIdClaim = User.FindFirst("UserId");
+        Console.WriteLine($"Admin ID Claim Value: {adminIdClaim.Value}");
+        if (adminIdClaim == null)
+        {
+            return Unauthorized("User not authenticated");
+        }
+
+        Console.WriteLine($"Admin ID Claim Value: {adminIdClaim.Value}");
+        Console.WriteLine($"Admin ID Claim Type: {adminIdClaim.Type}");
+
+        if (!int.TryParse(adminIdClaim.Value, out int adminId))
+        {
+            return BadRequest($"Invalid admin ID. Claim value: {adminIdClaim.Value}");
+        }
+
+        Console.WriteLine($"Parsed Admin ID: {adminId}");
+
+        // Check if the admin exists in the database
+        var adminExists = await _context.Admin.AnyAsync(a => a.ID == adminId);
+        if (!adminExists)
+        {
+            return BadRequest($"Admin with ID {adminId} does not exist in the database");
+        }
 
         // Validate input
         if (newsCreateDTO == null)
@@ -162,20 +191,20 @@ public class NewsController : ControllerBase
             return BadRequest("At least one photo is required.");
         }
 
-        // Initialize a new News entity with provided properties
+
         var news = new News
         {
             Title = newsCreateDTO.Title,
             Content = newsCreateDTO.Content,
             DateTime = DateTime.UtcNow,
-            AdminID = 1,
+            AdminID = adminId,
         };
 
 
-        // Handle Club associations (optional)
+
         if (newsCreateDTO.ClubIds != null && newsCreateDTO.ClubIds.Any())
         {
-            // Validate ClubIds and create associations
+
             var validClubs = await _context.Club
                 .Where(c => newsCreateDTO.ClubIds.Contains(c.ID))
                 .ToListAsync();
@@ -190,19 +219,19 @@ public class NewsController : ControllerBase
                 ClubID = c.ID
             }).ToList();
         }
-        // Add and save News entity first to ensure it gets an ID
+
         _context.News.Add(news);
         await _context.SaveChangesAsync();
 
-        // Handle Pictures if provided in the DTO
+
         if (newsCreateDTO.Pictures != null && newsCreateDTO.Pictures.Any())
         {
             foreach (var file in newsCreateDTO.Pictures)
             {
-                // Skip any null files
+
                 if (file == null) continue;
 
-                // Generate a unique filename for the blob and upload to Azure
+
                 string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
                 string blobUrl;
                 await using (var fileStream = file.OpenReadStream())
@@ -210,39 +239,39 @@ public class NewsController : ControllerBase
                     blobUrl = await _blobService.UploadPhotoAsync(fileStream, fileName);
                 }
 
-                // Create and save Picture entity
+
                 var picture = new Picture { BlobUrl = blobUrl };
                 _context.Picture.Add(picture);
-                await _context.SaveChangesAsync(); // Save Picture to ensure it has an ID
+                await _context.SaveChangesAsync();
 
-                // Create and add NewsPictures relationship to link News and Picture
                 news.NewsPictures.Add(new NewsPictures { NewsID = news.ID, PictureID = picture.ID });
             }
         }
 
-        // Save all changes for NewsPictures and News entities
+
         await _context.SaveChangesAsync();
 
-        // Return created news with 201 status code and location
+
         return Ok(news);
     }
 
     [HttpGet("paginated")]
     public async Task<ActionResult<PagedResult<NewsDTO>>> GetPaginatedNews(int pageNumber = 1, int pageSize = 10)
     {
-        // Ensure pageNumber and pageSize are valid
+
         if (pageNumber < 1 || pageSize < 1)
         {
             return BadRequest(new { message = "Invalid pagination parameters." });
         }
 
-        // Get total count of news items
+
         var totalItems = await _context.News.CountAsync();
 
-        // Fetch paginated results
+
         var newsList = await _context.News
             .Include(n => n.NewsClubs).ThenInclude(nc => nc.Club)
             .Include(n => n.Admin)
+            .OrderByDescending(n => n.DateTime)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(n => new NewsDTO
@@ -268,7 +297,7 @@ public class NewsController : ControllerBase
             .ToArrayAsync();
 
 
-        // Return paginated results
+
         return Ok(new PagedResult<NewsDTO>
         {
             TotalItems = totalItems,
@@ -278,14 +307,14 @@ public class NewsController : ControllerBase
         });
     }
     
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{Id}")]
     public async Task<IActionResult> DeleteNews(int Id)
     {
         var news = await _context.News
-        .Include(n => n.NewsClubs)  // Include related NewsClubs
+        .Include(n => n.NewsClubs)  
         .Include(n => n.NewsPictures)
-            .ThenInclude(np => np.Picture)  // Include related Pictures
+            .ThenInclude(np => np.Picture)
         .FirstOrDefaultAsync(n => n.ID == Id);
 
         if (news == null)
@@ -293,10 +322,10 @@ public class NewsController : ControllerBase
             return NotFound(new { message = "News not found" });
         }
 
-        // First, remove related NewsClub entries
+
         _context.NewsClubs.RemoveRange(news.NewsClubs);
 
-        // Then, delete the pictures from Azure Blob Storage
+
         foreach (var newsPicture in news.NewsPictures)
         {
             var blobUrl = newsPicture.Picture.BlobUrl;
@@ -304,18 +333,18 @@ public class NewsController : ControllerBase
             await _blobService.DeletePhotoAsync(fileName);
         }
 
-        // Remove the related NewsPictures from the database
+
         _context.NewsPictures.RemoveRange(news.NewsPictures);
 
-        // Finally, remove the News entity
+
         _context.News.Remove(news);
 
-        // Save changes to apply the deletions
+
         await _context.SaveChangesAsync();
 
-        return NoContent();  // Return HTTP 204 No Content on successful deletion
-    }
-    //[Authorize(Roles = "Admin")]
+        return NoContent();  
+        }
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateNews(int id, [FromForm] NewsUpdateDto newsUpdateDTO)
     {
@@ -329,7 +358,7 @@ public class NewsController : ControllerBase
             return NotFound(new { message = "News not found" });
         }
         Console.WriteLine("Received ClubIds: " + (newsUpdateDTO.ClubIds != null ? string.Join(",", newsUpdateDTO.ClubIds) : "null"));
-        // Update title and content if provided
+
         if (!string.IsNullOrWhiteSpace(newsUpdateDTO.Title))
         {
             news.Title = newsUpdateDTO.Title;
@@ -340,17 +369,17 @@ public class NewsController : ControllerBase
         }
 
 
-        // Handle club associations
+
         if (newsUpdateDTO.ClubIds != null)
         {
-            // Remove clubs that are not in the provided ClubIds
+
             var clubsToUnlink = news.NewsClubs
                 .Where(nc => !newsUpdateDTO.ClubIds.Contains(nc.ClubID))
                 .ToList();
 
             _context.NewsClubs.RemoveRange(clubsToUnlink);
 
-            // Add new clubs that are not already linked
+
             var existingClubIds = news.NewsClubs.Select(nc => nc.ClubID).ToList();
             var newClubsToAdd = newsUpdateDTO.ClubIds
                 .Where(clubId => !existingClubIds.Contains(clubId))
@@ -360,13 +389,13 @@ public class NewsController : ControllerBase
         }
         else
         {
-            // If ClubIds is null, unlink all clubs
+
             _context.NewsClubs.RemoveRange(news.NewsClubs);
         }
-        // Manage Pictures
+
         if (newsUpdateDTO.DeleteAllPictures)
         {
-            // Delete all associated pictures from Azure and database
+
             foreach (var newsPicture in news.NewsPictures)
             {
                 var blobUrl = newsPicture.Picture.BlobUrl;
@@ -377,7 +406,7 @@ public class NewsController : ControllerBase
         }
         else
         {
-            // Delete specific pictures if provided (by URL)
+
             if (newsUpdateDTO.PicturesToDelete != null && newsUpdateDTO.PicturesToDelete.Any())
             {
                 foreach (var pictureUrl in newsUpdateDTO.PicturesToDelete)
@@ -394,7 +423,7 @@ public class NewsController : ControllerBase
             }
         }
 
-        // Add new pictures if provided
+
         if (newsUpdateDTO.NewPictures != null)
         {
             foreach (var file in newsUpdateDTO.NewPictures)
@@ -410,7 +439,7 @@ public class NewsController : ControllerBase
 
                 var picture = new Picture { BlobUrl = blobUrl };
                 _context.Picture.Add(picture);
-                await _context.SaveChangesAsync(); // Save Picture to get an ID
+                await _context.SaveChangesAsync(); 
 
                 news.NewsPictures.Add(new NewsPictures { NewsID = news.ID, PictureID = picture.ID });
             }
@@ -426,8 +455,8 @@ public class NewsController : ControllerBase
     {
         if (string.IsNullOrEmpty(query) || string.IsNullOrWhiteSpace(query))
         {
-            return Ok(new List<object>()); // Vraća prazan niz za prazan unos
-            //return Ok();
+            return Ok(new List<object>()); 
+
         }
         var predictions = await _context.News
             .Where(n => n.Title.Contains(query) || n.Content.Contains(query))
@@ -436,7 +465,7 @@ public class NewsController : ControllerBase
         return Ok(predictions);
     }
 
-    // PagedResult class
+
     public class PagedResult<T>
     {
         public int TotalItems { get; set; }

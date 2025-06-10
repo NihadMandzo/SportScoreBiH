@@ -1,4 +1,3 @@
-
 import {Player, PlayerPost} from './../Services/DTO/Player';
 import { Component, OnInit } from '@angular/core';
 import { PlayerServiceService } from '../Services/player-service.service';
@@ -6,19 +5,23 @@ import {CommonModule, DatePipe, NgForOf, NgIf, SlicePipe} from '@angular/common'
 import { FormsModule } from '@angular/forms';
 import { Club } from '../Services/DTO/Club';
 import {ClubServiceService} from '../Services/club-service.service';
-import {Router} from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import {last} from 'rxjs';
-
 
 @Component({
   selector: 'app-player',
   standalone:true,
-  imports: [FormsModule, NgForOf, NgIf, DatePipe],
+  imports: [
+    FormsModule, 
+    NgForOf, 
+    NgIf, 
+    DatePipe,
+    RouterModule
+  ],
   templateUrl: 'player.component.html',
   styleUrls: ['player.component.css'],
   providers:[DatePipe]
 })
-
 
 export class PlayerComponent implements OnInit {
 

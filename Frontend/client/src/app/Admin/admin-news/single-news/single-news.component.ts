@@ -30,10 +30,10 @@ export class SingleNewsComponent implements OnInit{
   selectedClubs: number[] = [];
   clubs:Club[]=[];
 
-  existingPictureUrls: { url: string }[] = []; // Holds URLs of existing pictures
-  newPictures: File[] = []; // New pictures selected by the user
-  previewUrls: SafeUrl[] = []; // Previews for new pictures
-  picturesToDelete: string[] = []; // URLs of pictures to delete
+  existingPictureUrls: { url: string }[] = []; 
+  newPictures: File[] = []; 
+  previewUrls: SafeUrl[] = []; 
+  picturesToDelete: string[] = []; 
   deleteAllPhotos: boolean = false;
 
   titleError: string = '';
@@ -71,7 +71,6 @@ export class SingleNewsComponent implements OnInit{
     this.title = loadedNews.title;
     this.content = loadedNews.content;
     this.selectedClubs = loadedNews.clubs.map((club) => club.id);
-    // Populate existingPictureUrls with URLs of the selected news's pictures
     this.existingPictureUrls = loadedNews.pictures.map((url) => ({ url }));
     this.previewUrls = [];
     this.newPictures = [];
@@ -93,13 +92,12 @@ export class SingleNewsComponent implements OnInit{
   }
 
    addNews(): void {
-   if (!this.validateForm()) return; // Check validations
+   if (!this.validateForm()) return; 
 
     if (confirm('Are you sure you want to add this news?')) {
       const formData = new FormData();
       formData.append('title', this.title);
       formData.append('content', this.content);
-      // Add ClubIds only if clubs are selected
       if (this.selectedClubs && this.selectedClubs.length > 0) {
         this.selectedClubs.forEach((clubId) =>
           formData.append('clubIds', clubId.toString())
@@ -115,7 +113,7 @@ export class SingleNewsComponent implements OnInit{
         () => {
 
           this.resetForm();
-          this.router.navigate(['admin-news']);
+          this.router.navigate(['/admin/news']);
         },
         (error) => alert('Error adding news')
       );
@@ -127,12 +125,12 @@ export class SingleNewsComponent implements OnInit{
       console.log(
         'All clubs removed, selectedClubs array is now:',
         this.selectedClubs
-      ); // Debugging log
+      ); 
     }
   }
 
    removeExistingPicture(pictureUrl: string): void {
-    this.picturesToDelete.push(pictureUrl); // Queue URL for deletion in backend
+    this.picturesToDelete.push(pictureUrl); 
     this.existingPictureUrls = this.existingPictureUrls.filter(
       (picture) => picture.url !== pictureUrl
     );
@@ -142,7 +140,7 @@ export class SingleNewsComponent implements OnInit{
     }
   }
 
-  // Update an existing news item
+
   updateNews(): void {
     if (!this.validateForm()) return;
 
@@ -156,7 +154,7 @@ export class SingleNewsComponent implements OnInit{
         );
       }
 
-      // Log the selected clubs to verify
+
       console.log(
         "Selected Clubs (should be empty if 'Remove All Clubs' was clicked):",
         this.selectedClubs
@@ -184,30 +182,31 @@ export class SingleNewsComponent implements OnInit{
         );
       }
     }
-    this.router.navigate(['/admin-news']);
+    this.router.navigate(['/admin/news']);
   }
 
   validateForm(): boolean {
     let isValid = true;
 
-    // Title validation
-    // Title validation
-    if (!this.title || !/^[a-zA-Z].{9,}$/.test(this.title)) {
+
+    const trimmedTitle = this.title.trim();
+    if (!trimmedTitle || trimmedTitle.length < 10) {
       this.titleError = 'Title must contain at least 10 characters.';
       isValid = false;
     } else {
       this.titleError = '';
     }
 
-    // Content validation
-    if (!this.content || !/^[a-zA-Z].{34,}$/.test(this.content.trim())) {
+
+    const trimmedContent = this.content.trim();
+    if (!trimmedContent || trimmedContent.length < 35) {
       this.contentError = 'Content must contain at least 35 letters.';
       isValid = false;
     } else {
       this.contentError = '';
     }
 
-    // Pictures validation
+
     if (
       this.existingPictureUrls.length === 0 &&
       this.newPictures.length === 0
@@ -287,11 +286,11 @@ export class SingleNewsComponent implements OnInit{
     this.existingPictureUrls = [];
     this.newPictures = [];
     this.previewUrls = [];
-    this.picturesToDelete = []; // Clear pictures to delete
-    this.deleteAllPhotos = false; // Reset delete all photos flag
+    this.picturesToDelete = [];
+    this.deleteAllPhotos = false;
   }
   cancel():void{
     this.resetForm();
-    this.router.navigate(['/admin-news']);
+    this.router.navigate(['/admin/news']);
   }
 }

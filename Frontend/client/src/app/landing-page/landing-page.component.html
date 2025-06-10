@@ -1,14 +1,14 @@
 <div class="landing-page" [class.white-background]="showLoginRegisterSection">
     <div class="overlay" *ngIf="!showLoginRegisterSection"></div>
 
-    <!-- Main Content -->
+
     <div class="main-content" *ngIf="!showLoginRegisterSection" @fadeIn @slideDown>
       <h1>Započnite novu avanturu</h1>
       <p>Avanturu u svijet Wwin Premijer lige BiH</p>
       <button (click)="start()">Start</button>
     </div>
 
-    <!-- Login/Register Section -->
+
     <div class="login-register-section" *ngIf="showLoginRegisterSection" @fadeIn>
       <div>
         <button class="auth-button" (click)="showLoginForm()">Login</button>

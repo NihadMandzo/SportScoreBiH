@@ -6,6 +6,7 @@ using API.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static API.Controllers.AdminControllers.NewsController;
 
 namespace API.Controllers
 {
@@ -20,7 +21,7 @@ namespace API.Controllers
             _context = context;
         }
 
-        // GET: api/Comment/news/{newsId}
+
         [HttpGet("news/{newsId}")]
         public async Task<IActionResult> GetCommentsForNews(int newsId)
         {
@@ -29,7 +30,7 @@ namespace API.Controllers
 
             var comments = await _context.Comment
         .Where(c => c.NewsID == newsId)
-        .Include(c => c.User) // Include user details
+        .Include(c => c.User) 
         .Select(c => new CommentDTO
         {
             Id = c.ID,
@@ -42,15 +43,14 @@ namespace API.Controllers
             UserReaction = _context.CommentReaction
                 .Where(r => r.CommentId == c.ID && r.UserId == parsedUserId)
                 .Select(r => r.IsLike ? "like" : "dislike")
-                .FirstOrDefault() // Fetch the current user's reaction
+                .FirstOrDefault() 
         })
         .ToArrayAsync();
 
             return Ok(comments);
         }
 
-        // POST: api/Comment
-        //[Authorize(Roles ="User")]
+        [Authorize(Roles = "User")]
         [HttpPost]
         public async Task<IActionResult> AddComment(int newsId, [FromBody] CommentCreateDTO commentDto)
         {
@@ -69,13 +69,13 @@ namespace API.Controllers
             return CreatedAtAction(nameof(GetCommentsForNews), new { newsId = comment.NewsID }, commentDto);
         }
 
-        // PUT: api/Comment/{id}
+
         public class UpdateCommentDTO
         {
             public string NewComment { get; set; }
             public int UserId { get; set; }
         }
-        //[Authorize(Roles ="User")]
+        [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateComment(int id, [FromBody] UpdateCommentDTO dto)
         {
@@ -85,9 +85,15 @@ namespace API.Controllers
             if (comment == null)
                 return NotFound();
 
-            // Update the comment
-            comment.Content = dto.NewComment;
+            var currentUserId = int.Parse(User.FindFirst("UserId")?.Value);
+            
 
+            if (comment.UserID != currentUserId)
+            {
+                return Unauthorized("You can only update your own comments");
+            }
+
+            comment.Content = dto.NewComment;
             await _context.SaveChangesAsync();
 
             return Ok(new CommentDTO
@@ -99,18 +105,25 @@ namespace API.Controllers
                 NewsID = comment.NewsID
             });
         }
-        // DELETE: api/Comment/{id}     
+ 
 
-        //[Authorize(Roles ="User,Admin")]
+        [Authorize(Roles = "User,Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComment(int id)
         {
             var comment = await _context.Comment.FindAsync(id);
-
             if (comment == null)
                 return NotFound();
 
-            // Privremena logika bez autorizacije
+            var currentUserId = int.Parse(User.FindFirst("UserId")?.Value);
+            var isAdmin = User.IsInRole("Admin");
+
+
+            if (!isAdmin && comment.UserID != currentUserId)
+            {
+                return Unauthorized("You can only delete your own comments");
+            }
+
             _context.Comment.Remove(comment);
             await _context.SaveChangesAsync();
 
@@ -118,24 +131,33 @@ namespace API.Controllers
         }
 
 
+        [Authorize(Roles = "User")]
         [HttpPut("react")]
         public async Task<IActionResult> ReactToComment(int commentId, int userId, bool isLike)
         {
-            // Check if the comment exists
+
+            var currentUserId = int.Parse(User.FindFirst("UserId")?.Value);
+            
+
+            if (currentUserId != userId)
+            {
+                return Unauthorized("You can only react with your own user ID");
+            }
+
+
             var comment = await _context.Comment.FirstOrDefaultAsync(c => c.ID == commentId);
             if (comment == null)
             {
                 return NotFound("Comment not found");
             }
 
-            // Check if the user exists
             var user = await _context.User.FindAsync(userId);
             if (user == null)
             {
                 return Unauthorized("User not found or not logged in");
             }
 
-            // Check if the reaction exists
+
             var existingReaction = await _context.CommentReaction
        .FirstOrDefaultAsync(r => r.CommentId == commentId && r.UserId == userId);
 
@@ -143,19 +165,19 @@ namespace API.Controllers
             {
                 if (existingReaction.IsLike == isLike)
                 {
-                    // Remove the reaction if toggling the same reaction
+
                     _context.CommentReaction.Remove(existingReaction);
                 }
                 else
                 {
-                    // Update the existing reaction
+
                     existingReaction.IsLike = isLike;
                     _context.CommentReaction.Update(existingReaction);
                 }
             }
             else
             {
-                // Add a new reaction
+
                 var newReaction = new CommentReaction
                 {
                     CommentId = commentId,
@@ -165,14 +187,14 @@ namespace API.Controllers
                 _context.CommentReaction.Add(newReaction);
             }
 
-            // Save changes to the CommentReaction table
+
             await _context.SaveChangesAsync();
 
-            // Recalculate like and dislike counts
+
             int likeCount = await _context.CommentReaction.CountAsync(r => r.CommentId == commentId && r.IsLike == true);
             int dislikeCount = await _context.CommentReaction.CountAsync(r => r.CommentId == commentId && r.IsLike == false);
 
-            // Update the Comment table with the new counts
+
             comment.Like = likeCount;
             comment.Dislike = dislikeCount;
             _context.Comment.Update(comment);
@@ -185,7 +207,51 @@ namespace API.Controllers
                 userReaction = isLike ? "like" : "dislike"
             });
         }
+        [Authorize(Roles = "Admin")]
+        [HttpGet("comments")]
+        public async Task<ActionResult<PagedResult<AllCommentsDto>>> GetComments(int pageNumber = 1, int pageSize = 10)
+        {
+
+            if (pageNumber < 1 || pageSize < 1)
+            {
+                return BadRequest(new { message = "Invalid pagination parameters." });
+            }
 
 
+            var totalItems = await _context.Comment.CountAsync();
+
+
+            var comments = await _context.Comment
+                .OrderByDescending(c => c.DateTime)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new AllCommentsDto
+                {
+                    Id = c.ID,
+                    Comment = c.Content,
+                    DateTime = c.DateTime,
+                    Username = c.User.UserName,
+                    Like = c.Like,
+                    Dislike = c.Dislike,
+                })
+                .ToArrayAsync();
+
+            return Ok(new PagedResult<AllCommentsDto>
+            {
+                TotalItems = totalItems,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Items = comments
+            });
+        }
+    }
+
+    public class AllCommentsDto{
+        public int Id { get; set; }
+        public string Comment { get; set; }
+        public DateTime DateTime { get; set; }
+        public string Username { get; set; }
+        public int Like { get; set; }
+        public int Dislike { get; set; }
     }
 }

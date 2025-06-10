@@ -1,4 +1,4 @@
-/* Main container for the news list and form */
+
 .news-container {
     display: flex;
     flex-direction: column;
@@ -8,7 +8,7 @@
     margin: auto;
   }
   
-  /* News list container */
+
   .news-list {
     display: flex;
     flex-direction: column;
@@ -70,7 +70,7 @@
     background-color: darkred;
   }
   
-  /* Pagination controls */
+
   .pagination {
     display: flex;
     justify-content: center;
@@ -97,8 +97,7 @@
     margin: 0 10px;
     align-self: center;
   }
-  
-  /* Form styles */
+
   form {
     width: 100%;
     padding: 20px;
@@ -127,8 +126,7 @@
     border-radius: 5px;
     border: 1px solid #ccc;
   }
-  
-  /* Validation messages */
+
   .validation-error {
     color: red;
     font-size: 0.9em;
@@ -140,7 +138,7 @@
     background-color: #ffe6e6;
   }
   
-  /* Image grid for existing and new pictures */
+
   .image-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -183,7 +181,7 @@
     background-color: darkred;
   }
   
-  /* Custom file upload styling */
+
   .custom-file-upload {
     position: relative;
     overflow: hidden;
@@ -215,7 +213,7 @@
     width: 100%;
   }
   
-  /* Action buttons */
+
   .btn-primary {
     background-color: #007bff;
     color: white;
@@ -254,7 +252,7 @@
     background-color: #5a6268;
   }
   
-  /* Drag and Drop Area */
+
   .drag-drop-area {
     border: 2px dashed #007bff;
     border-radius: 5px;
@@ -286,7 +284,7 @@
     background-color: #e0f7fa;
   }
   
-  /* Image Grid */
+
   .image-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -329,24 +327,24 @@
     background-color: darkred;
   }
   
-    /* Wrapper around the select and button */
+
     .select-wrapper {
       display: flex;
       align-items: center;
-      gap: 10px; /* Add some space between the select and button */
+      gap: 10px; 
     }
     
-    /* Style for the select element */
+
     .club-select {
-      width: 200px; /* Adjust width as needed */
-      height: 100px; /* Adjust height for better visibility */
-      font-size: 14px; /* Smaller text */
-      padding: 5px; /* Padding for better readability */
+      width: 200px; 
+      height: 100px;
+      font-size: 14px; 
+      padding: 5px; 
       border: 1px solid #ccc;
       border-radius: 4px;
     }
     
-    /* Style for the remove button */
+
     .remove-button {
       padding: 8px 12px;
       font-size: 14px;
@@ -358,7 +356,7 @@
       transition: background-color 0.3s;
     }
     
-    /* Style for button on hover */
+
     .remove-button:hover {
       background-color: #d32f2f;
     }

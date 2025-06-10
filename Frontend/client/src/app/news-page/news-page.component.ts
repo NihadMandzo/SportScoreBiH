@@ -2,7 +2,6 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { AIServiceService } from '../Services/aiservice.service';
 import { NewsDTO, NewsService } from '../Services/news-service.service';
 import { ClubServiceService } from '../Services/club-service.service';
@@ -16,27 +15,25 @@ import {Subject} from 'rxjs';
   selector: 'app-news-page',
   standalone: true,
   imports: [
-    NavbarComponent,
-    RouterLink,
     FormsModule,
     NgFor,
     InfiniteScrollDirective,
     NgIf,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './news-page.component.html',
   styleUrls: ['./news-page.component.css'],
 })
 export class NewsPageComponent implements OnInit {
   isAIWidgetOpen: boolean = false;
-  userInput: string = ''; // Pitanje korisnika
-  aiResponse: string = ''; // Odgovor od AI
+  userInput: string = ''; 
+  aiResponse: string = ''; 
 
   newsList: NewsDTO[] = [];
   clubList: Club[] = [];
 
   page = 1;
-  pageSize = 10;
+  pageSize = 6;
   totalItems = 0;
   loading = false;
 
@@ -53,6 +50,20 @@ export class NewsPageComponent implements OnInit {
   private searchSubject: Subject<string> = new Subject<string>(); // Subject za debouncing
 
   @ViewChild('carousel', { static: false }) carousel!: ElementRef;
+  @ViewChild('newsGrid') newsGrid!: ElementRef;
+
+  carouselIndex = 0;
+
+  get carouselOffset() {
+
+    return -(this.carouselIndex * 100);
+  }
+
+  infiniteScrollOptions = {
+    distance: 1,       
+    throttle: 100,     
+    scrollWindow: true  
+  };
 
   constructor(
     private aiService: AIServiceService,
@@ -136,12 +147,14 @@ export class NewsPageComponent implements OnInit {
   }
 
   onScroll(): void {
-    console.log('Scroll event triggered');
-    if (this.newsList.length < this.totalItems) {
+    if (this.loading) return;
+    
+    const element = this.newsGrid.nativeElement;
+    const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 100;
+    
+    if (atBottom) {
       console.log('Loading more news...');
       this.loadNews();
-    } else {
-      console.log('No more news to load');
     }
   }
 
@@ -150,7 +163,7 @@ export class NewsPageComponent implements OnInit {
       console.error('Invalid news ID:', id);
       return;
     }
-    this.router.navigate(['/news', id]);
+    this.router.navigate(['/user/news', id]);
   }
 
   loadClubs(): void {
@@ -165,20 +178,15 @@ export class NewsPageComponent implements OnInit {
     );
   }
   scrollLeft() {
-    if (this.carousel) {
-      console.log('Carousel found:', this.carousel.nativeElement);
-      this.carousel.nativeElement.scrollBy({ left: -200, behavior: 'smooth' });
-    } else {
-      console.error('Carousel element not found.');
+    if (this.carouselIndex > 0) {
+      this.carouselIndex = Math.max(this.carouselIndex - 4, 0);
     }
   }
 
   scrollRight() {
-    if (this.carousel) {
-      console.log('Carousel found:', this.carousel.nativeElement);
-      this.carousel.nativeElement.scrollBy({ left: 200, behavior: 'smooth' });
-    } else {
-      console.error('Carousel element not found.');
+    const maxIndex = Math.max(0, this.clubList.length - 4);
+    if (this.carouselIndex < maxIndex) {
+      this.carouselIndex = Math.min(this.carouselIndex + 4, maxIndex);
     }
   }
   LoadNewsByClubID(clubId: number, isScrolling: boolean = false): void {
@@ -206,7 +214,7 @@ export class NewsPageComponent implements OnInit {
             this.newsPage++;
           }
           this.newsLoading = false;
-          console.log(response); // Reset loading state
+          console.log(response); 
         },
         (error) => {
           console.error('Error loading news:', error);
@@ -215,22 +223,22 @@ export class NewsPageComponent implements OnInit {
       );
   }
   loadNews(): void {
-    if (this.loading) return; // Prevent duplicate API calls
+    if (this.loading) return;
 
-    this.loading = true; // Set loading to true
-    this.newsService.getPaginatedNews(this.page, this.pageSize).subscribe(
-      (response) => {
-        // Append new items to the existing news list
+    this.loading = true;
+    this.newsService.getPaginatedNews(this.page, this.pageSize).subscribe({
+      next: (response) => {
         this.newsList = [...this.newsList, ...response.items];
-        this.totalItems = response.totalItems; // Update total items count
-        this.page++; // Increment page number for next request
-        this.loading = false; // Reset loading state
+        this.totalItems = response.totalItems;
+        this.page++;
+        this.loading = false;
       },
-      (error) => {
+      error: (error) => {
         console.error('Error loading news:', error);
-        this.loading = false; // Reset loading state
+        this.loading = false;
+        
       }
-    );
+    });
   }
   onScrollClubs(): void {
     if (this.newsByClub.length < this.newsTotalItems && !this.newsLoading) {

@@ -1,0 +1,103 @@
+.comments-container {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  margin: 100px auto;
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.comments-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.comments-table-wrapper {
+  overflow-x: auto;
+}
+
+.comments-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mat-header-cell {
+  background-color: #f5f5f5;
+  color: #333;
+  font-weight: 600;
+  padding: 12px 16px;
+}
+
+.mat-cell {
+  padding: 12px 16px;
+  color: #666;
+}
+
+.username-column {
+  min-width: 120px;
+}
+
+.comment-column {
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.date-column {
+  min-width: 150px;
+}
+
+.likes-column {
+  min-width: 100px;
+}
+
+.actions-column {
+  min-width: 80px;
+  text-align: center;
+}
+
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.likes-dislikes {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.like-count {
+  color: #4caf50;
+}
+
+.dislike-count {
+  color: #f44336;
+}
+
+.mat-paginator {
+  margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .comments-container {
+    padding: 10px;
+  }
+
+  .comment-column {
+    min-width: 200px;
+  }
+
+  .truncate-text {
+    max-width: 200px;
+  }
+}

@@ -1,13 +1,11 @@
 <div class="FullBody">
-  <div class="LeftBody">
-    <app-navbar></app-navbar>
-  </div>
+
 
   <div class="CenterBody">
     <div class="LeftCenterBody">
       <div class="Logo">
-        <img [src]="club?.pictureUrl" alt="{{ club?.name }}" class="club-logo" />
-        <h3>{{ club?.name }}</h3> <!-- Prikaz imena kluba -->
+        <img [src]="club.pictureUrl" alt="{{ club.name }}" class="club-logo" />
+        <h3>{{ club.name }}</h3> <!-- Prikaz imena kluba -->
       </div>
 
       <!-- Kontakti kluba centrira se ovdje -->
@@ -41,8 +39,8 @@
       </div>
 
 
-      <div class="Stadium" *ngIf="club?.stadium">
-        <h4>Stadion: {{ club?.stadium?.name }}</h4>
+      <div class="Stadium" *ngIf="club.stadium">
+        <h4>Stadion: {{ club.stadium.name }}</h4>
         <div class="google-map">
           <google-map
             height="100%"
@@ -68,7 +66,7 @@
           <p>{{club.stadium.capacity}}</p>
       </h4>
       </div>
-        <div class="stadium-gallery" *ngIf="club?.stadium?.stadiumPictures?.length??0 > 0">
+        <div class="stadium-gallery" *ngIf="club.stadium.stadiumPictures?.length??0 > 0">
           <h4>Stadion Galerija</h4>
 
           <!-- Slider kontejner -->
